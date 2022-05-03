@@ -56,6 +56,8 @@ render = Render()
 for i in range(8):
     render.generate_row()
 
+for i in range(len(render.LEVEL_MAP_NUMBERS)):
+    render.level_row()
 
 MOVING_RIGHT = False
 MOVING_LEFT = False
@@ -82,7 +84,6 @@ def allow_left():
         return True
 
 
-
 last_direction = 'right'
 idle = Idle()
 player_state = 0
@@ -90,7 +91,8 @@ count = 0
 count_since_last_input = 0
 while running:
     if count == 0:
-        render.drawmap()
+        #render.drawmap()
+        render.draw_level()
     count += 1
 
     if count % 30 == 0 and count_since_last_input > 432:
@@ -100,7 +102,8 @@ while running:
             player_state = 0
     
     #RESET sky every frame
-    render.redraw_sky()
+    #render.redraw_sky()
+    render.redraw_sky_level()
     
     if last_direction == 'right':
         if player_state == 0:
@@ -173,7 +176,7 @@ while running:
     
     pygame.display.update()
     clock.tick(FRAME_RATE)
-    print(clock.get_fps())
+    #print(clock.get_fps())
 
 
 

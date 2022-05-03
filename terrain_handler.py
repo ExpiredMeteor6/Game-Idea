@@ -28,6 +28,10 @@ class Chunk:
             self.CHUNK = [[3 for x in range (8)] for y in range (8)]
             self.ore_generation()
     
+    def convert_map_to_chunks(self, x, y, MAP):
+        self.x_y = (x, y)
+        self.CHUNK = MAP[x][y]
+
     def dirt_noise_generation(self):
         self.CHUNK = [[2 for x in range (8)] for y in range (8)]
         for i in range(self.CHUNK_SIZE):
