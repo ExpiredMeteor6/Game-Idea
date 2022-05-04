@@ -108,7 +108,7 @@ def block_to_screen_coords(x, y):
     screen_coords = ((x * render.BLOCK_SIZE) + 0, (y * render.BLOCK_SIZE) + 0)
     return screen_coords
 
-
+'''
 def allow_right():
     if render.screen.get_at((int(player_location[0])+32, int(player_location[1])+30)) != (140, 255, 251, 255):
         return False
@@ -121,29 +121,46 @@ def allow_left():
         return False
     else:
         return True
+'''
 
 def allow_down(blob_x, blob_y, vertical_momentum):
-    '''
-    currentx,currenty = screen_to_block_coords(blob_screen_position_x, blob_screen_position_y)
-
-    downblockx,downblocky = (current_x,currenty-1)
-    downblockxscreen,downblockyscreen = block_to_screen_coords(downblockx, downblocky)
-
-    vert_distance_to_down = downblockyscreen- blob_screen_position_y
-    '''
     current_blob_position = screen_to_block_coords((blob_x, blob_y))
     block_beneath = (current_blob_position[0], current_blob_position[1] - 1)
     block_beneath_screen_coords = block_to_screen_coords(block_beneath[0], block_beneath[1])
-    print(block_beneath_screen_coords)
+
     num_block_beneath = get_block(block_beneath_screen_coords)
     vertical_distance_to_down = current_blob_position[1] - block_beneath_screen_coords[1]
 
-    #print(num_block_beneath)
     if vertical_distance_to_down < vertical_momentum and num_block_beneath != 0:
         return False
     else:
         return True
 
+def allow_right(blob_x, blob_y):
+    current_blob_position = screen_to_block_coords((blob_x, blob_y))
+    block_right = (current_blob_position[0], current_blob_position[1])
+    block_right_screen_coords = block_to_screen_coords(block_right[0], block_right[1])
+    num_block_right = get_block(block_right_screen_coords)
+    horizontal_distance_to_right = block_right_screen_coords[0] - current_blob_position[0] 
+
+    print(horizontal_distance_to_right)
+    print(num_block_right)
+    if horizontal_distance_to_right < 4 and num_block_right != 0:
+        return False
+    else:
+        return True
+
+def allow_left(blob_x, blob_y):
+    current_blob_position = screen_to_block_coords((blob_x, blob_y))
+    block_left = (current_blob_position[0] - 1, current_blob_position[1])
+    block_left_screen_coords = block_to_screen_coords(block_left[0], block_left[1])
+    num_block_left = get_block(block_left_screen_coords)
+    horizontal_distance_to_left = current_blob_position[0] - block_left_screen_coords[0]
+
+    if horizontal_distance_to_left < 4 and num_block_left != 0:
+        return False
+    else:
+        return True
 
 
 
@@ -199,11 +216,11 @@ while running:
         VERTICAL_MOMENTUM = 4
         ON_GROUND = True
 
-    if MOVING_RIGHT == True and allow_right() == True:
+    if MOVING_RIGHT == True and allow_right(int(player_location[0]) + render.BLOCK_SIZE, int(player_location[1]) + render.BLOCK_SIZE) == True:
         player_location[0] += 4
         last_direction = 'right'
 
-    if MOVING_LEFT == True and allow_left() == True:
+    if MOVING_LEFT == True and allow_left(int(player_location[0]), int(player_location[1]) + render.BLOCK_SIZE * 2) == True:
         player_location[0] -= 4
         last_direction = 'left'
 
