@@ -51,9 +51,9 @@ class Chunk:
     def ore_generation(self):
         for x in range(self.CHUNK_SIZE):
             for y in range(self.CHUNK_SIZE):
-                cur_noise = opensimplex.noise2(x=((x + self.x_y[0] * self.CHUNK_SIZE) * 1.5 + 0.1), y=((y + self.x_y[1] * self.CHUNK_SIZE) * 1.5 + 0.1))
-            if cur_noise > 0:
-                self.CHUNK[x][y] = 4
+                cur_noise = opensimplex.noise2(x=((x + self.x_y[0] * self.CHUNK_SIZE) * 0.35 + 0.05), y=((y + self.x_y[1] * self.CHUNK_SIZE) * 0.35 + 0.05))
+                if cur_noise > 0.5:
+                    self.CHUNK[x][y] = 4
         
 
     def convertNoiseToInt(self, noise, variation):
@@ -94,5 +94,5 @@ class Chunk:
                 x +=1
     
     def block_rotation(self, ycoord, xcoord):
-        rotation = opensimplex.noise2(x=((ycoord * self.CHUNK_SIZE * xcoord) * 0.3 + 100), y=0)
+        rotation = opensimplex.noise2(x=((xcoord + self.x_y[0] * self.CHUNK_SIZE) * 1.5 + 0.05), y=((ycoord + self.x_y[1] * self.CHUNK_SIZE) * 1.5 + 0.05))
         return self.convertNoiseToInt(rotation, 4)

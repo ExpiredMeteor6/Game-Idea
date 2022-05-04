@@ -184,7 +184,7 @@ class Render:
         if random_num == 0:
             block_rotated_img = block
         else:
-            block_rotated_img = pygame.transform.rotate(self.stone_img, random_num * 90)
+            block_rotated_img = pygame.transform.rotate(block, random_num * 90)
         return block_rotated_img
     
     #STORY MODE

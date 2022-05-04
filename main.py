@@ -91,8 +91,8 @@ count = 0
 count_since_last_input = 0
 while running:
     if count == 0:
-        #render.drawmap()
-        render.draw_level()
+        render.drawmap()
+        #render.draw_level()
     count += 1
 
     if count % 30 == 0 and count_since_last_input > 432:
@@ -102,8 +102,8 @@ while running:
             player_state = 0
     
     #RESET sky every frame
-    #render.redraw_sky()
-    render.redraw_sky_level()
+    render.redraw_sky()
+    #render.redraw_sky_level()
     
     if last_direction == 'right':
         if player_state == 0:
