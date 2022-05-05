@@ -69,8 +69,8 @@ ALLOW_LEFT = False
 ON_GROUND = False
 VERTICAL_MOMENTUM = 4
 
-#player_location = [1024, 100]
-player_location = [50, 100]
+player_location = [1024, 100]
+#player_location = [50, 100]
 
 def screen_to_block_coords(pos):
     current_block_size = render.BLOCK_SIZE
@@ -125,11 +125,11 @@ def allow_left():
 
 def allow_down(blob_x, blob_y, vertical_momentum):
     current_blob_position = screen_to_block_coords((blob_x, blob_y))
-    block_beneath = (current_blob_position[0], current_blob_position[1] - 1)
+    block_beneath = (current_blob_position[0], current_blob_position[1] + 1)
     block_beneath_screen_coords = block_to_screen_coords(block_beneath[0], block_beneath[1])
 
     num_block_beneath = get_block(block_beneath_screen_coords)
-    vertical_distance_to_down = current_blob_position[1] - block_beneath_screen_coords[1]
+    vertical_distance_to_down = blob_y - block_beneath_screen_coords[1]
 
     if vertical_distance_to_down < vertical_momentum and num_block_beneath != 0:
         return False
@@ -138,13 +138,12 @@ def allow_down(blob_x, blob_y, vertical_momentum):
 
 def allow_right(blob_x, blob_y):
     current_blob_position = screen_to_block_coords((blob_x, blob_y))
-    block_right = (current_blob_position[0], current_blob_position[1])
+    block_right = (current_blob_position[0] + 1, current_blob_position[1])
     block_right_screen_coords = block_to_screen_coords(block_right[0], block_right[1])
     num_block_right = get_block(block_right_screen_coords)
-    horizontal_distance_to_right = block_right_screen_coords[0] - current_blob_position[0] 
+    horizontal_distance_to_right = block_right_screen_coords[0] - blob_x - render.BLOCK_SIZE
 
-    print(horizontal_distance_to_right)
-    print(num_block_right)
+    
     if horizontal_distance_to_right < 4 and num_block_right != 0:
         return False
     else:
@@ -155,8 +154,10 @@ def allow_left(blob_x, blob_y):
     block_left = (current_blob_position[0] - 1, current_blob_position[1])
     block_left_screen_coords = block_to_screen_coords(block_left[0], block_left[1])
     num_block_left = get_block(block_left_screen_coords)
-    horizontal_distance_to_left = current_blob_position[0] - block_left_screen_coords[0]
+    horizontal_distance_to_left = blob_x - block_left_screen_coords[0] - render.BLOCK_SIZE
 
+    print(horizontal_distance_to_left)
+    print(num_block_left)
     if horizontal_distance_to_left < 4 and num_block_left != 0:
         return False
     else:
@@ -206,30 +207,34 @@ while running:
         VERTICAL_MOMENTUM += 0.1
         player_location[1] += VERTICAL_MOMENTUM
     '''
-    if allow_down(int(player_location[0]), int(player_location[1]) + render.BLOCK_SIZE * 2, VERTICAL_MOMENTUM) == True:
+    MAX_GRAVITY = 16
+    GRAVITY_ACCELERATION = 1
+    JUMP_ACCELERATION = -16
+
+    if allow_down(int(player_location[0]), int(player_location[1]), min(MAX_GRAVITY, VERTICAL_MOMENTUM + GRAVITY_ACCELERATION)) == True:
         #print("allowed down")
         ON_GROUND = False
         #VERTICAL_MOMENTUM += 0.1
+        VERTICAL_MOMENTUM += GRAVITY_ACCELERATION
+        VERTICAL_MOMENTUM = min(MAX_GRAVITY, VERTICAL_MOMENTUM)
         player_location[1] += VERTICAL_MOMENTUM
     else:
-        #print("not allowed down")    
-        VERTICAL_MOMENTUM = 4
+        VERTICAL_MOMENTUM = 0
+        #print("not allowed down")   
         ON_GROUND = True
 
-    if MOVING_RIGHT == True and allow_right(int(player_location[0]) + render.BLOCK_SIZE, int(player_location[1]) + render.BLOCK_SIZE) == True:
+    if MOVING_RIGHT == True and allow_right(int(player_location[0]), int(player_location[1])) == True:
         player_location[0] += 4
         last_direction = 'right'
 
-    if MOVING_LEFT == True and allow_left(int(player_location[0]), int(player_location[1]) + render.BLOCK_SIZE * 2) == True:
+    if MOVING_LEFT == True and allow_left(int(player_location[0]), int(player_location[1])) == True:
         player_location[0] -= 4
         last_direction = 'left'
 
     if MOVING_UP == True and ON_GROUND == True:
         count = 0
-        while count < 10:
-            VERTICAL_MOMENTUM -= 0.4
-            player_location[1] += VERTICAL_MOMENTUM
-            count += 1
+        VERTICAL_MOMENTUM = JUMP_ACCELERATION
+        player_location[1] += VERTICAL_MOMENTUM
         MOVING_UP = False
     
     if MOVING_LEFT == False and MOVING_RIGHT == False and MOVING_UP == False:
