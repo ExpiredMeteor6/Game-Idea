@@ -11,45 +11,6 @@ pygame.init()
 clock = pygame.time.Clock()
 FRAME_RATE = 144
 
-'''
-TEST_MAP = [['0', '0', '0', '0', '0', '0', '0', '0'],
-            ['0', '0', '0', '0', '0', '0', '0', '0'],
-            ['0', '0', '0', '0', '0', '0', '0', '0'], 
-            ['0', '0', '0', '0', '0', '0', '0', '0'], 
-            ['0', '0', '0', '0', '0', '0', '0', '0'], 
-            ['0', '0', '0', '0', '0', '0', '0', '0'], 
-            ['0', '0', '0', '0', '0', '0', '0', '0'], 
-            ['0', '0', '0', '0', '0', '0', '0', '0'],
-
-            ['0', '0', '0', '0', '0', '0', '0', '0'],
-            ['0', '0', '0', '0', '0', '0', '0', '0'],
-            ['0', '0', '0', '0', '0', '0', '0', '0'], 
-            ['0', '0', '0', '0', '0', '0', '0', '0'], 
-            ['0', '0', '0', '0', '1', '1', '1', '1'], 
-            ['1', '1', '1', '1', '2', '2', '2', '2'], 
-            ['2', '2', '2', '2', '2', '2', '2', '2'], 
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ['2', '2', '2', '2', '2', '2', '2', '2'],
-            ]
-'''
-
 pygame.display.set_caption('Terrain Test')
 
 running = True
@@ -60,6 +21,7 @@ for i in range(8):
 for i in range(len(render.LEVEL_MAP_NUMBERS)):
     render.level_row()
 
+render.convert_map_list_to_level(render.file.load())
 MOVING_RIGHT = False
 MOVING_LEFT = False
 MOVING_UP = False
@@ -68,7 +30,7 @@ ALLOW_RIGHT = False
 ALLOW_LEFT = False
 ON_GROUND = False
 VERTICAL_MOMENTUM = 4
-
+mode = "Level"
 player_location = [1024, 100]
 #player_location = [50, 100]
 
@@ -100,7 +62,10 @@ def get_block(pos):
     chunk_coords = (math.floor(actual_x_pos / 8), math.floor(actual_y_pos / 8))
     block_within_chunk_coords = (actual_x_pos - chunk_coords[0] * 8, actual_y_pos - chunk_coords[1] * 8)
 
-    block = render.TEST_MAP[chunk_coords[0] * 4 + chunk_coords[1]].CHUNK[block_within_chunk_coords[1]][block_within_chunk_coords[0]]
+    if mode == "Level":
+        block = render.LEVEL_MAP[chunk_coords[0] * 4 + chunk_coords[1]].CHUNK[block_within_chunk_coords[1]][block_within_chunk_coords[0]]
+    elif mode == "Freeplay":
+        block = render.TEST_MAP[chunk_coords[0] * 4 + chunk_coords[1]].CHUNK[block_within_chunk_coords[1]][block_within_chunk_coords[0]]
     return block
 
 def block_to_screen_coords(x, y):
@@ -129,7 +94,8 @@ def allow_down(blob_x, blob_y, vertical_momentum):
     block_beneath_screen_coords = block_to_screen_coords(block_beneath[0], block_beneath[1])
 
     num_block_beneath = get_block(block_beneath_screen_coords)
-    vertical_distance_to_down = blob_y - block_beneath_screen_coords[1]
+    vertical_distance_to_down = blob_y - block_beneath_screen_coords[1] - 1
+    print(num_block_beneath)
 
     if vertical_distance_to_down < vertical_momentum and num_block_beneath != 0:
         return False
@@ -156,8 +122,8 @@ def allow_left(blob_x, blob_y):
     num_block_left = get_block(block_left_screen_coords)
     horizontal_distance_to_left = blob_x - block_left_screen_coords[0] - render.BLOCK_SIZE
 
-    print(horizontal_distance_to_left)
-    print(num_block_left)
+    #print(horizontal_distance_to_left)
+    #print(num_block_left)
     if horizontal_distance_to_left < 4 and num_block_left != 0:
         return False
     else:
@@ -173,8 +139,8 @@ count = 0
 count_since_last_input = 0
 while running:
     if count == 0:
-        render.drawmap()
-        #render.draw_level()
+        #render.drawmap()
+        render.draw_level()
     count += 1
 
     if count % 30 == 0 and count_since_last_input > 432:
@@ -184,8 +150,9 @@ while running:
             player_state = 0
     
     #RESET sky every frame
-    render.redraw_sky()
-    #render.redraw_sky_level()
+    #render.redraw_sky()
+    render.wipe()
+    render.draw_level()
     
     if last_direction == 'right':
         if player_state == 0:
@@ -208,10 +175,10 @@ while running:
         player_location[1] += VERTICAL_MOMENTUM
     '''
     MAX_GRAVITY = 16
-    GRAVITY_ACCELERATION = 1
+    GRAVITY_ACCELERATION = 0.8
     JUMP_ACCELERATION = -16
 
-    if allow_down(int(player_location[0]), int(player_location[1]), min(MAX_GRAVITY, VERTICAL_MOMENTUM + GRAVITY_ACCELERATION)) == True:
+    if allow_down(int(player_location[0]) + render.movement_horizontal, int(player_location[1]) + render.movement_vertical, min(MAX_GRAVITY, VERTICAL_MOMENTUM + GRAVITY_ACCELERATION)) == True and allow_down(int(player_location[0])+32 + render.movement_horizontal, int(player_location[1]) + render.movement_vertical, min(MAX_GRAVITY, VERTICAL_MOMENTUM + GRAVITY_ACCELERATION)) == True:
         #print("allowed down")
         ON_GROUND = False
         #VERTICAL_MOMENTUM += 0.1
@@ -223,6 +190,7 @@ while running:
         #print("not allowed down")   
         ON_GROUND = True
 
+    '''
     if MOVING_RIGHT == True and allow_right(int(player_location[0]), int(player_location[1])) == True:
         player_location[0] += 4
         last_direction = 'right'
@@ -241,7 +209,12 @@ while running:
         count_since_last_input += 1
     else:
         pass
-    
+    '''
+    if MOVING_RIGHT == True and allow_right(int(player_location[0]) + render.movement_horizontal, int(player_location[1]) + render.movement_vertical) == True:
+        render.movement_horizontal -= 1
+
+    if MOVING_LEFT == True and allow_left(int(player_location[0]) + render.movement_horizontal, int(player_location[1]) + render.movement_vertical) == True:
+        render.movement_horizontal += 1
 
     for event in pygame.event.get():
         # Check for QUIT event      
@@ -269,6 +242,11 @@ while running:
                 MOVING_RIGHT = False
             if event.key == pygame.K_a:
                 MOVING_LEFT = False
+        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                print(pygame.mouse.get_pos(), player_location)
+            
     
     pygame.display.update()
     clock.tick(FRAME_RATE)
