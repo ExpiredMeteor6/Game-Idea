@@ -48,6 +48,7 @@ def screen_to_block_coords(pos):
 
     return (actual_x_pos, actual_y_pos)
 
+'''
 def get_block(pos):
     current_block_size = render.BLOCK_SIZE
     #WHEN CAMERA MOVEMENT IMPLEMENTED USE THIS
@@ -67,7 +68,7 @@ def get_block(pos):
     elif mode == "Freeplay":
         block = render.TEST_MAP[chunk_coords[0] * 4 + chunk_coords[1]].CHUNK[block_within_chunk_coords[1]][block_within_chunk_coords[0]]
     return block
-
+'''
 def block_to_screen_coords(x, y):
     #screen_coords = ((x * render.BLOCK_SIZE) + render.offset_x, (y * render.BLOCK_SIZE) + render.offset_y)
     screen_coords = ((x * render.BLOCK_SIZE) + 0, (y * render.BLOCK_SIZE) + 0)
@@ -88,6 +89,21 @@ def allow_left():
         return True
 '''
 
+def get_block(pos):
+    current_block_size = render.BLOCK_SIZE
+
+    horizontal_offset = (render.movement_horizontal * current_block_size)
+    vertical_offset = (render.movement_vertical * current_block_size)
+
+    actual_x_pos = math.floor((pos[0] - horizontal_offset) / current_block_size)
+    actual_y_pos = math.floor((pos[1] - vertical_offset) / current_block_size)
+
+    chunk_coords = (math.floor(actual_x_pos / 8), math.floor(actual_y_pos / 8))
+    block_within_chunk_coords = (int((actual_x_pos / 8 - chunk_coords[0]) * 8), int((actual_y_pos / 8 - chunk_coords[1]) * 8))
+
+    block = render.LEVEL_MAP[chunk_coords[0] * 4 + chunk_coords[1]].CHUNK[block_within_chunk_coords[1]][block_within_chunk_coords[0]]
+    return block
+
 def allow_down(blob_x, blob_y, vertical_momentum):
     current_blob_position = screen_to_block_coords((blob_x, blob_y))
     block_beneath = (current_blob_position[0], current_blob_position[1] + 1)
@@ -95,7 +111,7 @@ def allow_down(blob_x, blob_y, vertical_momentum):
 
     num_block_beneath = get_block(block_beneath_screen_coords)
     vertical_distance_to_down = blob_y - block_beneath_screen_coords[1] - 1
-    print(num_block_beneath)
+    #print(num_block_beneath)
 
     if vertical_distance_to_down < vertical_momentum and num_block_beneath != 0:
         return False
@@ -128,7 +144,6 @@ def allow_left(blob_x, blob_y):
         return False
     else:
         return True
-
 
 
 
