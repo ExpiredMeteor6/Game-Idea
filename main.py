@@ -28,15 +28,14 @@ mode = "Level"
 def ray_march(current_position, direction):
     pixels_traveled = 0
     max_pixels = 16
+    print(get_block(current_position))
     while get_block(current_position) == 0 and pixels_traveled <= max_pixels:
-        print(get_block(current_position))
         pixels_traveled += 1
         current_position[0] += direction[0]
         current_position[1] += direction[1]
     return pixels_traveled
 
 def get_block(current_position):
-    print(current_position)
     current_block_size = render.BLOCK_SIZE
 
     horizontal_offset = (render.movement_horizontal * current_block_size)

@@ -52,10 +52,10 @@ class Player(Entity):
     def on_key_press(self, key):
         if key == pygame.K_d:
             self.moving = 1
-            self.state = 1
+            self.state = 0
         if key == pygame.K_a:
             self.moving = -1
-            self.state = 0
+            self.state = 1
         if key == pygame.K_SPACE:
             pass
     
@@ -87,17 +87,18 @@ class Player(Entity):
             pos[1] += 32
             can_move2 = self.raymarch_func(pos, (1, 0))
             if min(can_move1, can_move2) >= 8:
-                self.render.movement_horizontal += self.moving / 4
+                self.render.movement_horizontal -= self.moving / 4
+            print(can_move1, can_move2)
         
-        if self.moving == 1:
+        if self.moving == -1:
             pos = copy.copy(self.position)
-            can_move1 = self.raymarch_func(pos, (1, 0))
+            can_move1 = self.raymarch_func(pos, (-1, 0))
 
             pos = copy.copy(self.position)
             pos[1] += 32
-            can_move2 = self.raymarch_func(pos, (1, 0))
+            can_move2 = self.raymarch_func(pos, (-1, 0))
             if min(can_move1, can_move2) >= 8:
-                self.render.movement_horizontal += self.moving / 4
+                self.render.movement_horizontal -= self.moving / 4
         
 
 class Cloud(Entity):
