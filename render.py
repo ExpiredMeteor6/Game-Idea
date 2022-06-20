@@ -113,6 +113,7 @@ class Render:
         self.gravel_img = pygame.transform.scale(self.gravel_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.iron_ore_img = pygame.transform.scale(self.iron_ore_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
 
+        pygame.mixer.init()
         pygame.mixer.music.load('Audio/Time.mp3')
         pygame.mixer.music.play(-1)
 
