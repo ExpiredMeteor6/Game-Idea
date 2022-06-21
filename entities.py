@@ -38,6 +38,7 @@ class Player(Entity):
         self.player_img_down_left = pygame.transform.scale(self.player_img_down_left, (self.Player_Size, self.Player_Size))
 
         self.state = 0
+        self.count = 0
 
     
     def get_texture(self):
@@ -45,6 +46,10 @@ class Player(Entity):
             texture = self.player_img_right
         if self.state == 1:
             texture = self.player_img_left
+        if self.state == 2:
+            texture = self.player_img_down_right
+        if self.state == 3:
+            texture = self.player_img_down_left
         else:
             pass
         return texture
@@ -52,10 +57,12 @@ class Player(Entity):
     def on_key_press(self, key):
         if key == pygame.K_d:
             self.moving = 1
-            self.state = 0
+            if self.state == 1 or self.state == 3:
+                self.state = 0
         if key == pygame.K_a:
             self.moving = -1
-            self.state = 1
+            if self.state == 0 or self.state == 2:
+                self.state = 1
         if key == pygame.K_SPACE:
             pass
     
@@ -66,8 +73,9 @@ class Player(Entity):
             self.moving = 0
     
     def tick(self):
+        self.count += 1
         pos = copy.copy(self.position)
-        pos[0] += 32
+        pos[0] += 30
         pos[1] += 32
         can_move1 = self.raymarch_func(pos, (0, 1))
 
@@ -84,21 +92,44 @@ class Player(Entity):
 
             pos = copy.copy(self.position)
             pos[0] += 32
-            pos[1] += 32
+            pos[1] += 31
             can_move2 = self.raymarch_func(pos, (1, 0))
             if min(can_move1, can_move2) >= 8:
                 self.render.movement_horizontal -= self.moving / 4
-            print(can_move1, can_move2)
+
         
         if self.moving == -1:
             pos = copy.copy(self.position)
             can_move1 = self.raymarch_func(pos, (-1, 0))
 
             pos = copy.copy(self.position)
-            pos[1] += 32
+            pos[1] += 31
             can_move2 = self.raymarch_func(pos, (-1, 0))
             if min(can_move1, can_move2) >= 8:
                 self.render.movement_horizontal -= self.moving / 4
+
+        if self.moving != 0 and self.count % 5 == 0:
+            self.bounce()
+        
+        if self.moving == 0:
+            if self.state == 2:
+                self.state = 0
+            elif self.state == 3:
+                self.state = 1
+    
+    def idle(self):
+        pass
+
+    def bounce(self):
+        if self.state == 0:
+            self.state = 2
+        elif self.state == 2:
+            self.state = 0
+        
+        if self.state == 1:
+            self.state = 3
+        elif self.state == 3:
+            self.state = 1
         
 
 class Cloud(Entity):

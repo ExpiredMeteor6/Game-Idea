@@ -28,7 +28,6 @@ mode = "Level"
 def ray_march(current_position, direction):
     pixels_traveled = 0
     max_pixels = 16
-    print(get_block(current_position))
     while get_block(current_position) == 0 and pixels_traveled <= max_pixels:
         pixels_traveled += 1
         current_position[0] += direction[0]
