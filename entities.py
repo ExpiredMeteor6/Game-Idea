@@ -1,5 +1,6 @@
 import pygame
 import copy
+import time
 class Entity:
     def __init__(self, x, y, render, raymarch_func):
         self.render = render
@@ -39,6 +40,10 @@ class Player(Entity):
 
         self.state = 0
         self.count = 0
+        self.JUMPING = False
+        self.count_at_activation = 0
+        self.jump_decay = 0
+        self.ON_GROUND = False
 
     
     def get_texture(self):
@@ -63,17 +68,20 @@ class Player(Entity):
             self.moving = -1
             if self.state == 0 or self.state == 2:
                 self.state = 1
-        if key == pygame.K_SPACE:
-            pass
-    
+        
     def on_key_release(self, key):
         if key == pygame.K_d and self.moving == 1:
             self.moving = 0
         if key == pygame.K_a and self.moving == -1:
             self.moving = 0
+        if key == pygame.K_SPACE:
+            if self.count_at_activation == 0 and self.ON_GROUND == True:
+                self.JUMPING = True
+                self.count_at_activation = self.count
     
     def tick(self):
         self.count += 1
+        
         pos = copy.copy(self.position)
         pos[0] += 30
         pos[1] += 32
@@ -83,8 +91,44 @@ class Player(Entity):
         pos[1] += 32
         can_move2 = self.raymarch_func(pos, (0, 1))
 
-        self.position[1] += min(can_move1, can_move2, 16)
+        if can_move1 == 0 or can_move2 == 0:
+            self.ON_GROUND = True
+        else:
+            self.ON_GROUND = False
         
+        if self.JUMPING == False:
+            pos = copy.copy(self.position)
+            pos[0] += 30
+            pos[1] += 32
+            can_move1 = self.raymarch_func(pos, (0, 1))
+
+            pos = copy.copy(self.position)
+            pos[1] += 32
+            can_move2 = self.raymarch_func(pos, (0, 1))
+
+            self.position[1] += min(can_move1, can_move2, 10)
+        else:
+            pos = copy.copy(self.position)
+            pos[0] += 30
+            pos[1] += 10
+            can_move1 = self.raymarch_func(pos, (0, -1))
+
+            pos = copy.copy(self.position)
+            pos[1] += 10
+            can_move2 = self.raymarch_func(pos, (0, -1))
+
+            if can_move1 == 0 or can_move2 == 0:
+                self.jump_decay = 12
+
+            self.position[1] -= min(can_move1, can_move2, 12 - self.jump_decay)
+            if self.jump_decay == 12:
+                self.JUMPING = False
+                self.count_at_activation = 0
+                self.jump_decay = 0
+            else:
+                self.jump_decay += 1
+
+
         if self.moving == 1:
             pos = copy.copy(self.position)
             pos[0] += 32
@@ -97,7 +141,6 @@ class Player(Entity):
             if min(can_move1, can_move2) >= 8:
                 self.render.movement_horizontal -= self.moving / 4
 
-        
         if self.moving == -1:
             pos = copy.copy(self.position)
             can_move1 = self.raymarch_func(pos, (-1, 0))
