@@ -44,6 +44,7 @@ class Player(Entity):
         self.count_at_activation = 0
         self.jump_decay = 0
         self.ON_GROUND = False
+        self.downward_momentum = 0
 
     
     def get_texture(self):
@@ -68,16 +69,16 @@ class Player(Entity):
             self.moving = -1
             if self.state == 0 or self.state == 2:
                 self.state = 1
+        if key == pygame.K_SPACE:
+            if self.count_at_activation == 0 and self.ON_GROUND == True:
+                self.JUMPING = True
+                self.count_at_activation = self.count
         
     def on_key_release(self, key):
         if key == pygame.K_d and self.moving == 1:
             self.moving = 0
         if key == pygame.K_a and self.moving == -1:
             self.moving = 0
-        if key == pygame.K_SPACE:
-            if self.count_at_activation == 0 and self.ON_GROUND == True:
-                self.JUMPING = True
-                self.count_at_activation = self.count
     
     def tick(self):
         self.count += 1
@@ -106,7 +107,13 @@ class Player(Entity):
             pos[1] += 32
             can_move2 = self.raymarch_func(pos, (0, 1))
 
-            self.position[1] += min(can_move1, can_move2, 10)
+            self.position[1] += min(can_move1, can_move2, self.downward_momentum)
+
+            if min(can_move1, can_move2, 10) == 0:
+                self.downward_momentum = 0
+            else:
+                if self.downward_momentum < 14:
+                    self.downward_momentum += 2
         else:
             pos = copy.copy(self.position)
             pos[0] += 30
