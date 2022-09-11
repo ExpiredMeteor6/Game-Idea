@@ -6,6 +6,6 @@ class File_Handler:
         self.MAP = []
 
     def load(self):
-        with open('Level Saves/first_attempt.json', "r") as lvlmap:
+        with open('Level Saves/test.json', "r") as lvlmap:
             map_list = json.load(lvlmap)
         return map_list
