@@ -89,17 +89,17 @@ class Render:
 
         self.screen = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
 
-        self.player_img_right = pygame.image.load('Images/blob_right.png')
-        self.player_img_left = pygame.image.load('Images/blob_left.png')
-        self.player_img_down_right = pygame.image.load('Images/blob_down_right.png')
-        self.player_img_down_left = pygame.image.load('Images/blob_down_left.png')
+        self.player_img_right = pygame.image.load('Images/blob_right.png').convert()
+        self.player_img_left = pygame.image.load('Images/blob_left.png').convert()
+        self.player_img_down_right = pygame.image.load('Images/blob_down_right.png').convert()
+        self.player_img_down_left = pygame.image.load('Images/blob_down_left.png').convert()
 
-        self.grass_img = pygame.image.load('Images/grass.png')
-        self.air_img = pygame.image.load('Images/air.png')
-        self.dirt_img = pygame.image.load('Images/dirt.png')
-        self.stone_img = pygame.image.load('Images/stone.png')
-        self.gravel_img = pygame.image.load('Images/gravel.png')
-        self.iron_ore_img = pygame.image.load('Images/iron_ore.png')
+        self.grass_img = pygame.image.load('Images/grass.png').convert()
+        self.air_img = pygame.image.load('Images/air.png').convert()
+        self.dirt_img = pygame.image.load('Images/dirt.png').convert()
+        self.stone_img = pygame.image.load('Images/stone.png').convert()
+        self.gravel_img = pygame.image.load('Images/gravel.png').convert()
+        self.iron_ore_img = pygame.image.load('Images/iron_ore.png').convert()
 
         self.player_img_right = pygame.transform.scale(self.player_img_right, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.player_img_left = pygame.transform.scale(self.player_img_left, (self.BLOCK_SIZE, self.BLOCK_SIZE))

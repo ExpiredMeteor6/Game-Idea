@@ -52,7 +52,7 @@ def get_block(current_position):
 game_entities = []
 game_entities.append(Player(1024, 100, render, ray_march))
 
-idle = Idle()
+
 count = 0
 while running:
     if count == 0:

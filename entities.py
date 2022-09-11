@@ -124,10 +124,11 @@ class Player(Entity):
             pos[1] += 10
             can_move2 = self.raymarch_func(pos, (0, -1))
 
+            self.position[1] -= min(can_move1, can_move2, 12 - self.jump_decay)
+
             if can_move1 == 0 or can_move2 == 0:
                 self.jump_decay = 12
-
-            self.position[1] -= min(can_move1, can_move2, 12 - self.jump_decay)
+            
             if self.jump_decay == 12:
                 self.JUMPING = False
                 self.count_at_activation = 0
