@@ -6,7 +6,7 @@ import sys
 from render import Render
 import time
 import math
-from entities import Entity, Player
+from entities import Entity, Player, Enemy
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -34,6 +34,9 @@ def ray_march(current_position, direction):
         current_position[1] += direction[1]
     return pixels_traveled
 
+def get_player_location():
+    return game_entities[0].position
+
 def get_block(current_position):
     current_block_size = render.BLOCK_SIZE
 
@@ -50,7 +53,8 @@ def get_block(current_position):
     return block
 
 game_entities = []
-game_entities.append(Player(1024, 100, render, ray_march))
+game_entities.append(Player(1024, 100, render, ray_march, get_player_location))
+game_entities.append(Enemy(1000, 100, render, ray_march, get_player_location))
 
 
 count = 0

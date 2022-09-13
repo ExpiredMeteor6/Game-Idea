@@ -1,8 +1,10 @@
 import pygame
 import copy
 import time
+
+from main import get_player_location
 class Entity:
-    def __init__(self, x, y, render, raymarch_func):
+    def __init__(self, x, y, render, raymarch_func, get_player_location):
         self.render = render
         self.raymarch_func = raymarch_func
         self.position = [x, y]
@@ -20,8 +22,8 @@ class Entity:
         pass
 
 class Player(Entity):
-    def __init__(self, x, y, render, raymarch_func):
-        super().__init__(x, y, render, raymarch_func)
+    def __init__(self, x, y, render, raymarch_func, get_player_location):
+        super().__init__(x, y, render, raymarch_func, get_player_location)
 
         self.Player_Size = 32
 
@@ -91,6 +93,8 @@ class Player(Entity):
         pos = copy.copy(self.position)
         pos[1] += 32
         can_move2 = self.raymarch_func(pos, (0, 1))
+
+        print(get_player_location)
 
         if can_move1 == 0 or can_move2 == 0:
             self.ON_GROUND = True
@@ -188,10 +192,120 @@ class Cloud(Entity):
         super().__init__()
         pass
 
-class Enemy:
-    def __init__():
-        pass
+class Enemy(Entity):
+    def __init__(self, x, y, render, raymarch_func, get_player_location):
+        super().__init__(x, y, render, raymarch_func, get_player_location)
+        self.Player_Size = 32
 
-class Pet:
+        self.enemy_img_right = pygame.image.load('Images/red_blob_right.png')
+        self.enemy_img_left = pygame.image.load('Images/red_blob_left.png')
+
+        self.enemy_img_right = pygame.transform.scale(self.enemy_img_right, (self.Player_Size, self.Player_Size))
+        self.enemy_img_left = pygame.transform.scale(self.enemy_img_left, (self.Player_Size, self.Player_Size))
+
+        self.state = 0
+        self.moving = 0
+        self.speed = 4
+        self.count = 0
+        self.JUMPING = False
+        self.count_at_activation = 0
+        self.jump_decay = 0
+        self.ON_GROUND = False
+        self.downward_momentum = 0
+    
+    def get_texture(self):
+        if self.state == 0:
+            texture = self.enemy_img_right
+        if self.state == 1:
+            texture = self.enemy_img_left
+        #if self.state == 2:
+            #texture = self.player_img_down_right
+        #if self.state == 3:
+            #texture = self.player_img_down_left
+        else:
+            pass
+        return texture
+    
+    def tick(self):
+        self.count += 1
+        
+        pos = copy.copy(self.position)
+        pos[0] += 30
+        pos[1] += 32
+        can_move1 = self.raymarch_func(pos, (0, 1))
+
+        pos = copy.copy(self.position)
+        pos[1] += 32
+        can_move2 = self.raymarch_func(pos, (0, 1))
+
+        if can_move1 == 0 or can_move2 == 0:
+            self.ON_GROUND = True
+        else:
+            self.ON_GROUND = False
+        
+        if self.JUMPING == False:
+            pos = copy.copy(self.position)
+            pos[0] += 30
+            pos[1] += 32
+            can_move1 = self.raymarch_func(pos, (0, 1))
+
+            pos = copy.copy(self.position)
+            pos[1] += 32
+            can_move2 = self.raymarch_func(pos, (0, 1))
+
+            self.position[1] += min(can_move1, can_move2, self.downward_momentum)
+
+            if min(can_move1, can_move2, 10) == 0:
+                self.downward_momentum = 0
+            else:
+                if self.downward_momentum < 14:
+                    self.downward_momentum += 2
+        else:
+            pos = copy.copy(self.position)
+            pos[0] += 30
+            pos[1] += 10
+            can_move1 = self.raymarch_func(pos, (0, -1))
+
+            pos = copy.copy(self.position)
+            pos[1] += 10
+            can_move2 = self.raymarch_func(pos, (0, -1))
+
+            self.position[1] -= min(can_move1, can_move2, 12 - self.jump_decay)
+
+            if can_move1 == 0 or can_move2 == 0:
+                self.jump_decay = 12
+            
+            if self.jump_decay == 12:
+                self.JUMPING = False
+                self.count_at_activation = 0
+                self.jump_decay = 0
+            else:
+                self.jump_decay += 1
+
+        if self.moving == 1:
+            pos = copy.copy(self.position)
+            pos[0] += 32
+            can_move1 = self.raymarch_func(pos, (1, 0))
+
+            pos = copy.copy(self.position)
+            pos[0] += 32
+            pos[1] += 31
+            can_move2 = self.raymarch_func(pos, (1, 0))
+            if min(can_move1, can_move2) >= 8:
+                self.render.movement_horizontal -= self.moving / 4
+
+        if self.moving == -1:
+            pos = copy.copy(self.position)
+            can_move1 = self.raymarch_func(pos, (-1, 0))
+
+            pos = copy.copy(self.position)
+            pos[1] += 31
+            can_move2 = self.raymarch_func(pos, (-1, 0))
+            if min(can_move1, can_move2) >= 8:
+                self.render.movement_horizontal -= self.moving / 4
+    
+    
+
+class Pet(Entity):
     def __init__():
         pass
