@@ -56,7 +56,6 @@ game_entities = []
 game_entities.append(Player(1024, 100, render, ray_march, get_player_location))
 game_entities.append(Enemy(1000, 100, render, ray_march, get_player_location))
 
-
 count = 0
 while running:
     if count == 0:

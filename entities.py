@@ -2,10 +2,11 @@ import pygame
 import copy
 import time
 
-from main import get_player_location
+
 class Entity:
     def __init__(self, x, y, render, raymarch_func, get_player_location):
         self.render = render
+        self.get_player_location = get_player_location
         self.raymarch_func = raymarch_func
         self.position = [x, y]
     
@@ -24,7 +25,7 @@ class Entity:
 class Player(Entity):
     def __init__(self, x, y, render, raymarch_func, get_player_location):
         super().__init__(x, y, render, raymarch_func, get_player_location)
-
+        
         self.Player_Size = 32
 
         self.moving = 0
@@ -94,7 +95,7 @@ class Player(Entity):
         pos[1] += 32
         can_move2 = self.raymarch_func(pos, (0, 1))
 
-        print(get_player_location)
+        print(self.get_player_location)
 
         if can_move1 == 0 or can_move2 == 0:
             self.ON_GROUND = True
