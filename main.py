@@ -72,8 +72,13 @@ while running:
         texture = entity.get_texture()
         position = entity.position
 
-        render.screen.blit(texture, position)
-
+        if entity == game_entities[0]: 
+            render.screen.blit(texture, position)
+        else:
+            '''print((entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))'''
+            render.screen.blit(texture, (entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))
+        
+    for entity in game_entities:
         entity.tick()
         
 

@@ -95,7 +95,7 @@ class Player(Entity):
         pos[1] += 32
         can_move2 = self.raymarch_func(pos, (0, 1))
 
-        print(self.get_player_location)
+        '''print(self.get_player_location)'''
 
         if can_move1 == 0 or can_move2 == 0:
             self.ON_GROUND = True
@@ -164,7 +164,7 @@ class Player(Entity):
             if min(can_move1, can_move2) >= 8:
                 self.render.movement_horizontal -= self.moving / 4
 
-        if self.moving != 0 and self.count % 5 == 0:
+        if self.moving != 0 and self.count % 3 == 0:
             self.bounce()
         
         if self.moving == 0:
@@ -227,15 +227,21 @@ class Enemy(Entity):
             pass
         return texture
     
+    def get_offset_pos(self):
+        pos = copy.copy(self.position)
+        pos[0] += self.render.movement_horizontal * self.render.BLOCK_SIZE
+        pos[1] += self.render.movement_vertical * self.render.BLOCK_SIZE
+        return pos
+
     def tick(self):
         self.count += 1
         
-        pos = copy.copy(self.position)
+        pos = self.get_offset_pos()
         pos[0] += 30
         pos[1] += 32
         can_move1 = self.raymarch_func(pos, (0, 1))
 
-        pos = copy.copy(self.position)
+        pos = self.get_offset_pos()
         pos[1] += 32
         can_move2 = self.raymarch_func(pos, (0, 1))
 
@@ -245,15 +251,14 @@ class Enemy(Entity):
             self.ON_GROUND = False
         
         if self.JUMPING == False:
-            pos = copy.copy(self.position)
+            pos = self.get_offset_pos()
             pos[0] += 30
             pos[1] += 32
             can_move1 = self.raymarch_func(pos, (0, 1))
 
-            pos = copy.copy(self.position)
+            pos = self.get_offset_pos()
             pos[1] += 32
             can_move2 = self.raymarch_func(pos, (0, 1))
-
             self.position[1] += min(can_move1, can_move2, self.downward_momentum)
 
             if min(can_move1, can_move2, 10) == 0:
@@ -262,12 +267,12 @@ class Enemy(Entity):
                 if self.downward_momentum < 14:
                     self.downward_momentum += 2
         else:
-            pos = copy.copy(self.position)
+            pos = self.get_offset_pos()
             pos[0] += 30
             pos[1] += 10
             can_move1 = self.raymarch_func(pos, (0, -1))
 
-            pos = copy.copy(self.position)
+            pos = self.get_offset_pos()
             pos[1] += 10
             can_move2 = self.raymarch_func(pos, (0, -1))
 
@@ -284,26 +289,26 @@ class Enemy(Entity):
                 self.jump_decay += 1
 
         if self.moving == 1:
-            pos = copy.copy(self.position)
+            pos = self.get_offset_pos()
             pos[0] += 32
             can_move1 = self.raymarch_func(pos, (1, 0))
 
-            pos = copy.copy(self.position)
+            pos = self.get_offset_pos()
             pos[0] += 32
             pos[1] += 31
             can_move2 = self.raymarch_func(pos, (1, 0))
             if min(can_move1, can_move2) >= 8:
-                self.render.movement_horizontal -= self.moving / 4
+                pass
 
         if self.moving == -1:
-            pos = copy.copy(self.position)
+            pos = self.get_offset_pos()
             can_move1 = self.raymarch_func(pos, (-1, 0))
 
-            pos = copy.copy(self.position)
+            pos = self.get_offset_pos()
             pos[1] += 31
             can_move2 = self.raymarch_func(pos, (-1, 0))
             if min(can_move1, can_move2) >= 8:
-                self.render.movement_horizontal -= self.moving / 4
+                pass
     
     
 
