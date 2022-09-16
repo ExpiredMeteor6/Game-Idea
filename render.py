@@ -89,22 +89,12 @@ class Render:
 
         self.screen = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
 
-        self.player_img_right = pygame.image.load('Images/blob_right.png').convert()
-        self.player_img_left = pygame.image.load('Images/blob_left.png').convert()
-        self.player_img_down_right = pygame.image.load('Images/blob_down_right.png').convert()
-        self.player_img_down_left = pygame.image.load('Images/blob_down_left.png').convert()
-
         self.grass_img = pygame.image.load('Images/grass.png').convert()
         self.air_img = pygame.image.load('Images/air.png').convert()
         self.dirt_img = pygame.image.load('Images/dirt.png').convert()
         self.stone_img = pygame.image.load('Images/stone.png').convert()
         self.gravel_img = pygame.image.load('Images/gravel.png').convert()
         self.iron_ore_img = pygame.image.load('Images/iron_ore.png').convert()
-
-        self.player_img_right = pygame.transform.scale(self.player_img_right, (self.BLOCK_SIZE, self.BLOCK_SIZE))
-        self.player_img_left = pygame.transform.scale(self.player_img_left, (self.BLOCK_SIZE, self.BLOCK_SIZE))
-        self.player_img_down_right = pygame.transform.scale(self.player_img_down_right, (self.BLOCK_SIZE, self.BLOCK_SIZE))
-        self.player_img_down_left = pygame.transform.scale(self.player_img_down_left, (self.BLOCK_SIZE, self.BLOCK_SIZE))
 
         self.grass_img = pygame.transform.scale(self.grass_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.air_img = pygame.transform.scale(self.air_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
@@ -114,7 +104,7 @@ class Render:
         self.iron_ore_img = pygame.transform.scale(self.iron_ore_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
 
         pygame.mixer.init()
-        pygame.mixer.music.load('Audio/Mist.mp3')
+        pygame.mixer.music.load('Audio/Timeless.mp3')
         pygame.mixer.music.play(-1)
 
         grunt = pygame.mixer.Sound('Audio/Grunt_1.WAV')

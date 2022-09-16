@@ -200,9 +200,13 @@ class Enemy(Entity):
 
         self.enemy_img_right = pygame.image.load('Images/red_blob_right.png')
         self.enemy_img_left = pygame.image.load('Images/red_blob_left.png')
+        self.enemy_img_down_right = pygame.image.load('Images/red_blob_down_right.png')
+        self.enemy_img_down_left = pygame.image.load('Images/red_blob_down_left.png')
 
         self.enemy_img_right = pygame.transform.scale(self.enemy_img_right, (self.Player_Size, self.Player_Size))
         self.enemy_img_left = pygame.transform.scale(self.enemy_img_left, (self.Player_Size, self.Player_Size))
+        self.enemy_img_down_right = pygame.transform.scale(self.enemy_img_down_right, (self.Player_Size, self.Player_Size))
+        self.enemy_img_down_left = pygame.transform.scale(self.enemy_img_down_left, (self.Player_Size, self.Player_Size))
 
         self.state = 0
         self.moving = 0
@@ -219,10 +223,10 @@ class Enemy(Entity):
             texture = self.enemy_img_right
         if self.state == 1:
             texture = self.enemy_img_left
-        #if self.state == 2:
-            #texture = self.player_img_down_right
-        #if self.state == 3:
-            #texture = self.player_img_down_left
+        if self.state == 2:
+            texture = self.enemy_img_down_right
+        if self.state == 3:
+            texture = self.enemy_img_down_left
         else:
             pass
         return texture
@@ -232,6 +236,26 @@ class Enemy(Entity):
         pos[0] += self.render.movement_horizontal * self.render.BLOCK_SIZE
         pos[1] += self.render.movement_vertical * self.render.BLOCK_SIZE
         return pos
+
+    def on_key_press(self, key):
+        if key == pygame.K_RIGHT:
+            self.moving = 1
+            if self.state == 1 or self.state == 3:
+                self.state = 0
+        if key == pygame.K_LEFT:
+            self.moving = -1
+            if self.state == 0 or self.state == 2:
+                self.state = 1
+        if key == pygame.K_UP:
+            if self.count_at_activation == 0 and self.ON_GROUND == True:
+                self.JUMPING = True
+                self.count_at_activation = self.count
+        
+    def on_key_release(self, key):
+        if key == pygame.K_RIGHT and self.moving == 1:
+            self.moving = 0
+        if key == pygame.K_LEFT and self.moving == -1:
+            self.moving = 0
 
     def tick(self):
         self.count += 1
@@ -298,7 +322,7 @@ class Enemy(Entity):
             pos[1] += 31
             can_move2 = self.raymarch_func(pos, (1, 0))
             if min(can_move1, can_move2) >= 8:
-                pass
+                self.position[0] += 8
 
         if self.moving == -1:
             pos = self.get_offset_pos()
@@ -308,8 +332,27 @@ class Enemy(Entity):
             pos[1] += 31
             can_move2 = self.raymarch_func(pos, (-1, 0))
             if min(can_move1, can_move2) >= 8:
-                pass
+                self.position[0] -= 8
+        
+        if self.moving != 0 and self.count % 3 == 0:
+            self.bounce()
+        
+        if self.moving == 0:
+            if self.state == 2:
+                self.state = 0
+            elif self.state == 3:
+                self.state = 1
     
+    def bounce(self):
+        if self.state == 0:
+            self.state = 2
+        elif self.state == 2:
+            self.state = 0
+        
+        if self.state == 1:
+            self.state = 3
+        elif self.state == 3:
+            self.state = 1
     
 
 class Pet(Entity):
