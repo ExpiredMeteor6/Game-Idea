@@ -35,11 +35,13 @@ class Player(Entity):
         self.player_img_left = pygame.image.load('Images/blob_left.png')
         self.player_img_down_right = pygame.image.load('Images/blob_down_right.png')
         self.player_img_down_left = pygame.image.load('Images/blob_down_left.png')
+        #self.blue_projectile = pygame.image.load('Images/blue_projectile.png')
 
         self.player_img_right = pygame.transform.scale(self.player_img_right, (self.Player_Size, self.Player_Size))
         self.player_img_left = pygame.transform.scale(self.player_img_left, (self.Player_Size, self.Player_Size))
         self.player_img_down_right = pygame.transform.scale(self.player_img_down_right, (self.Player_Size, self.Player_Size))
         self.player_img_down_left = pygame.transform.scale(self.player_img_down_left, (self.Player_Size, self.Player_Size))
+        #self.blue_projectile = pygame.transform.scale(self.blue_projectile, (self.Player_Size, self.Player_Size))
 
         self.state = 0
         self.count = 0
@@ -48,7 +50,6 @@ class Player(Entity):
         self.jump_decay = 0
         self.ON_GROUND = False
         self.downward_momentum = 0
-
     
     def get_texture(self):
         if self.state == 0:

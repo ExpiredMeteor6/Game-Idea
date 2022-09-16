@@ -54,7 +54,11 @@ def get_block(current_position):
 
 game_entities = []
 game_entities.append(Player(1024, 100, render, ray_march, get_player_location))
-game_entities.append(Enemy(1000, 100, render, ray_march, get_player_location))
+game_entities.append(Enemy(980, 100, render, ray_march, get_player_location))
+#game_entities.append(Enemy(960, 100, render, ray_march, get_player_location))
+#game_entities.append(Enemy(940, 100, render, ray_march, get_player_location))
+#game_entities.append(Enemy(920, 100, render, ray_march, get_player_location))
+#game_entities.append(Enemy(900, 100, render, ray_march, get_player_location))
 
 count = 0
 while running:
