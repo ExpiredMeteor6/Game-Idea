@@ -16,8 +16,7 @@ pygame.display.set_caption('Terrain Test')
 
 running = True
 render = Render()
-for i in range(8):
-    render.generate_row()
+
 
 for i in range(len(render.LEVEL_MAP_NUMBERS)):
     render.level_row()
@@ -63,8 +62,10 @@ game_entities.append(Enemy(980, 100, render, ray_march, get_player_location))
 count = 0
 while running:
     if count == 0:
-        #render.drawmap()
         render.draw_level()
+        render.movement_horizontal += render.start_coords[1] * 32
+        render.draw_level()
+        
     count += 1
     
     #RESET sky every frame

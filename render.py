@@ -95,6 +95,7 @@ class Render:
         self.stone_img = pygame.image.load('Images/stone.png').convert()
         self.gravel_img = pygame.image.load('Images/gravel.png').convert()
         self.iron_ore_img = pygame.image.load('Images/iron_ore.png').convert()
+        self.start_img = pygame.image.load('Images/start.png').convert()
 
         self.grass_img = pygame.transform.scale(self.grass_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.air_img = pygame.transform.scale(self.air_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
@@ -102,6 +103,7 @@ class Render:
         self.stone_img = pygame.transform.scale(self.stone_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.gravel_img = pygame.transform.scale(self.gravel_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.iron_ore_img = pygame.transform.scale(self.iron_ore_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
+        self.start_img = pygame.transform.scale(self.start_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
 
         pygame.mixer.init()
         pygame.mixer.music.load('Audio/Timeless.mp3')
@@ -109,59 +111,7 @@ class Render:
 
         grunt = pygame.mixer.Sound('Audio/Grunt_1.WAV')
     
-    #FREE PLAY MODE
-    def generate_row(self):
-        y = 0
-        x = len(self.TEST_MAP) // 4
-        for i in range(4):
-            current_chunk = Chunk()
-            current_chunk.generate_chunk(x, y)
-            self.TEST_MAP.append(current_chunk)
-            y += 1
 
-    def drawmap(self):
-        for chunk in self.TEST_MAP:
-            y = 0
-            for row in chunk.CHUNK:
-                x = 0
-                for block in row:
-                    placex = (x + self.movement_horizontal + chunk.CHUNK_SIZE * chunk.x_y[0]) * self.BLOCK_SIZE
-                    placey = (y + self.movement_vertical + chunk.CHUNK_SIZE * chunk.x_y[1]) * self.BLOCK_SIZE
-
-                    place_img = lambda i : self.screen.blit(i, (placex, placey))
-                    place_rotated_img = lambda i : place_img(self.place_rotated_block(i, y, x))
-
-                    if block == 0:
-                        place_img(self.air_img)
-
-                    elif block == 1:
-                        place_img(self.grass_img)
-
-                    elif block == 2:
-                        place_rotated_img(self.dirt_img)
-                    
-                    elif block == 3:
-                        place_rotated_img(self.stone_img)
-                    
-                    elif block == 4:
-                        place_rotated_img(self.iron_ore_img)
-                    
-                    x += 1
-                y += 1
-    
-    def redraw_sky(self):
-        for chunk in self.TEST_MAP:
-            y=0
-            for row in chunk.CHUNK:
-                x=0
-                for block in row:
-                    if block == 0:
-                        self.screen.blit(self.air_img, ((x + chunk.CHUNK_SIZE * chunk.x_y[0]) * self.BLOCK_SIZE, (y + chunk.CHUNK_SIZE * chunk.x_y[1]) * self.BLOCK_SIZE))
-                    else:
-                        pass
-                    x +=1
-                y += 1
-    
     def redraw_sky_level(self):
         for chunk in self.LEVEL_MAP:
             y=0
@@ -222,6 +172,10 @@ class Render:
                     elif block == 4:
                         place_rotated_img(self.iron_ore_img)
                     
+                    elif block == 5:
+                        place_img(self.start_img)
+                        self.start_coords = (x, y)
+
                     x += 1
                 y += 1
     
