@@ -36,6 +36,9 @@ def ray_march(current_position, direction):
 def get_player_location():
     return game_entities[0].position
 
+def get_entity_location(position_in_list):
+    return game_entities[position_in_list].position
+
 def get_block(current_position):
     current_block_size = render.BLOCK_SIZE
 
@@ -51,9 +54,22 @@ def get_block(current_position):
     block = render.LEVEL_MAP[chunk_coords[0] * 4 + chunk_coords[1]].CHUNK[block_within_chunk_coords[1]][block_within_chunk_coords[0]]
     return block
 
+def get_block_coords(position):
+    current_block_size = render.BLOCK_SIZE
+
+    horizontal_offset = (render.movement_horizontal * current_block_size)
+    vertical_offset = (render.movement_vertical * current_block_size)
+
+    actual_x_pos = math.floor((position[0] - horizontal_offset) / current_block_size)
+    actual_y_pos = math.floor((position[1] - vertical_offset) / current_block_size)
+
+    chunk_coords = (math.floor(actual_x_pos / 8), math.floor(actual_y_pos / 8))
+    block_within_chunk_coords = (int((actual_x_pos / 8 - chunk_coords[0]) * 8), int((actual_y_pos / 8 - chunk_coords[1]) * 8))
+    return chunk_coords, block_within_chunk_coords
+
 game_entities = []
-game_entities.append(Player(1024, 100, render, ray_march, get_player_location))
-game_entities.append(Enemy(980, 100, render, ray_march, get_player_location))
+game_entities.append(Player(1024, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
+game_entities.append(Enemy(980, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 #game_entities.append(Enemy(960, 100, render, ray_march, get_player_location))
 #game_entities.append(Enemy(940, 100, render, ray_march, get_player_location))
 #game_entities.append(Enemy(920, 100, render, ray_march, get_player_location))

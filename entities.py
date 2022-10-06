@@ -4,11 +4,13 @@ import time
 
 
 class Entity:
-    def __init__(self, x, y, render, raymarch_func, get_player_location):
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location):
         self.render = render
         self.get_player_location = get_player_location
         self.raymarch_func = raymarch_func
         self.position = [x, y]
+        self.get_block_coords = get_block_coords
+        self.get_entity_location = get_entity_location
     
     def on_key_press(self, key):
         pass
@@ -23,8 +25,8 @@ class Entity:
         pass
 
 class Player(Entity):
-    def __init__(self, x, y, render, raymarch_func, get_player_location):
-        super().__init__(x, y, render, raymarch_func, get_player_location)
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location):
+        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location)
         
         self.Player_Size = 32
 
@@ -95,8 +97,6 @@ class Player(Entity):
         pos = copy.copy(self.position)
         pos[1] += 32
         can_move2 = self.raymarch_func(pos, (0, 1))
-
-        '''print(self.get_player_location)'''
 
         if can_move1 == 0 or can_move2 == 0:
             self.ON_GROUND = True
@@ -195,8 +195,8 @@ class Cloud(Entity):
         pass
 
 class Enemy(Entity):
-    def __init__(self, x, y, render, raymarch_func, get_player_location):
-        super().__init__(x, y, render, raymarch_func, get_player_location)
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location):
+        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location)
         self.Player_Size = 32
 
         self.enemy_img_right = pygame.image.load('Images/red_blob_right.png')
@@ -269,6 +269,10 @@ class Enemy(Entity):
         pos = self.get_offset_pos()
         pos[1] += 32
         can_move2 = self.raymarch_func(pos, (0, 1))
+
+        if self.count % 100 == 0:
+            print(f"Start Node: {self.get_block_coords(self.get_entity_location(1))}")
+            print(f"End Node: {self.get_block_coords(self.get_player_location())}")
 
         if can_move1 == 0 or can_move2 == 0:
             self.ON_GROUND = True
