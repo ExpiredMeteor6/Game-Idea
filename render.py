@@ -88,6 +88,7 @@ class Render:
         self.WINDOW_HEIGHT = 1024
 
         self.screen = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
+        self.BG = pygame.image.load('Images/Background.png').convert()
 
         self.grass_img = pygame.image.load('Images/grass.png').convert()
         self.air_img = pygame.image.load('Images/air.png').convert()
@@ -106,8 +107,9 @@ class Render:
         self.start_img = pygame.transform.scale(self.start_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
 
         pygame.mixer.init()
-        pygame.mixer.music.load('Audio/Timeless.mp3')
-        pygame.mixer.music.play(-1)
+        self.music = pygame.mixer.music
+        '''self.music.load('Audio/Timeless.mp3')'''
+        '''self.music.play(-1)'''
 
         grunt = pygame.mixer.Sound('Audio/Grunt_1.WAV')
     

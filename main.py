@@ -7,6 +7,7 @@ from render import Render
 import time
 import math
 from entities import Entity, Player, Enemy
+from button import Button
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -14,7 +15,7 @@ FRAME_RATE = 144
 
 pygame.display.set_caption('Terrain Test')
 
-running = True
+
 render = Render()
 
 
@@ -67,6 +68,36 @@ def get_block_coords(position):
     block_within_chunk_coords = (int((actual_x_pos / 8 - chunk_coords[0]) * 8), int((actual_y_pos / 8 - chunk_coords[1]) * 8))
     return chunk_coords, block_within_chunk_coords
 
+def Start_Screen():
+    displayed = True
+    render.screen.blit(render.BG, (0,0))
+
+    render.music.load('Audio/Time.mp3')
+    render.music.play(-1)
+
+    start_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Start", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
+
+    while displayed:
+        start_button.change_button_colour(pygame.mouse.get_pos())
+        start_button.button_update()
+    
+
+
+        for event in pygame.event.get():
+            # Check for QUIT event      
+            if event.type == pygame.QUIT:
+                displayed = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if start_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    displayed = False
+
+        pygame.display.update()
+        clock.tick(FRAME_RATE)
+
+
+
+Start_Screen()
+
 game_entities = []
 game_entities.append(Player(1024, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 game_entities.append(Enemy(980, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
@@ -75,51 +106,59 @@ game_entities.append(Enemy(980, 100, render, ray_march, get_player_location, get
 #game_entities.append(Enemy(920, 100, render, ray_march, get_player_location))
 #game_entities.append(Enemy(900, 100, render, ray_march, get_player_location))
 
-count = 0
-while running:
-    if count == 0:
-        render.draw_level()
-        render.movement_horizontal += render.start_coords[1] * 32
-        render.draw_level()
-        
-    count += 1
-    
-    #RESET sky every frame
-    #render.redraw_sky()
-    render.wipe()
-    render.draw_level()
+def Game_Screen():
+    running = True
 
-    for entity in game_entities:
-        texture = entity.get_texture()
-        position = entity.position
+    render.music.load('Audio/Timeless.mp3')
+    render.music.play(-1)
 
-        if entity == game_entities[0]: 
-            render.screen.blit(texture, position)
-        else:
-            '''print((entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))'''
-            render.screen.blit(texture, (entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))
-        
-    for entity in game_entities:
-        entity.tick()
-        
-
-    for event in pygame.event.get():
-        # Check for QUIT event      
-        if event.type == pygame.QUIT:
-            running = False
-
-        if event.type == pygame.KEYDOWN:
-            for entity in game_entities:
-                entity.on_key_press(event.key)
-
-        if event.type == pygame.KEYUP:
-            for entity in game_entities:
-                entity.on_key_release(event.key)
-        
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            pass
+    count = 0
+    while running:
+        if count == 0:
+            render.draw_level()
+            render.movement_horizontal += render.start_coords[1] * 32
+            render.draw_level()
             
-    
-    pygame.display.update()
-    clock.tick(FRAME_RATE)
-    #print(clock.get_fps())
+        count += 1
+        
+        #RESET sky every frame
+        #render.redraw_sky()
+        render.wipe()
+        render.draw_level()
+
+        for entity in game_entities:
+            texture = entity.get_texture()
+            position = entity.position
+
+            if entity == game_entities[0]: 
+                render.screen.blit(texture, position)
+            else:
+                '''print((entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))'''
+                render.screen.blit(texture, (entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))
+            
+        for entity in game_entities:
+            entity.tick()
+            
+
+        for event in pygame.event.get():
+            # Check for QUIT event      
+            if event.type == pygame.QUIT:
+                running = False
+
+            if event.type == pygame.KEYDOWN:
+                for entity in game_entities:
+                    entity.on_key_press(event.key)
+
+            if event.type == pygame.KEYUP:
+                for entity in game_entities:
+                    entity.on_key_release(event.key)
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pass
+                
+        
+        pygame.display.update()
+        clock.tick(FRAME_RATE)
+        #print(clock.get_fps())
+
+Game_Screen()
