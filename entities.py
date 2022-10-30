@@ -2,7 +2,7 @@ from tracemalloc import start
 import pygame
 import copy
 import time
-
+from pathfinding import PathFinder, Node, ConnectionAssessor
 
 class Entity:
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location):
@@ -12,6 +12,7 @@ class Entity:
         self.position = [x, y]
         self.get_block_coords = get_block_coords
         self.get_entity_location = get_entity_location
+        
     
     def on_key_press(self, key):
         pass
@@ -219,6 +220,8 @@ class Enemy(Entity):
         self.jump_decay = 0
         self.ON_GROUND = False
         self.downward_momentum = 0
+        
+        self.connectionassesor = ConnectionAssessor()
     
     def get_texture(self):
         if self.state == 0:
@@ -283,6 +286,9 @@ class Enemy(Entity):
             nodes = self.convert_local_coords_to_global()
             print(f"Start Node: {nodes[0]}")
             print(f"End Node: {nodes[1]}")
+
+            print(self.connectionassesor.get_connected_nodes(nodes[0]))
+
 
         if can_move1 == 0 or can_move2 == 0:
             self.ON_GROUND = True
