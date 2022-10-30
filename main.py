@@ -68,12 +68,13 @@ def get_block_coords(position):
     block_within_chunk_coords = (int((actual_x_pos / 8 - chunk_coords[0]) * 8), int((actual_y_pos / 8 - chunk_coords[1]) * 8))
     return chunk_coords, block_within_chunk_coords
 
+
 def Start_Screen():
     displayed = True
     render.screen.blit(render.BG, (0,0))
 
     render.music.load('Audio/Time.mp3')
-    render.music.play(-1)
+    '''render.music.play(-1)'''
 
     start_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Start", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
 
@@ -100,7 +101,7 @@ Start_Screen()
 
 game_entities = []
 game_entities.append(Player(1024, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
-game_entities.append(Enemy(980, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
+game_entities.append(Enemy(984, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 #game_entities.append(Enemy(960, 100, render, ray_march, get_player_location))
 #game_entities.append(Enemy(940, 100, render, ray_march, get_player_location))
 #game_entities.append(Enemy(920, 100, render, ray_march, get_player_location))
@@ -110,7 +111,7 @@ def Game_Screen():
     running = True
 
     render.music.load('Audio/Timeless.mp3')
-    render.music.play(-1)
+    '''render.music.play(-1)'''
 
     count = 0
     while running:

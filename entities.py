@@ -1,3 +1,4 @@
+from tracemalloc import start
 import pygame
 import copy
 import time
@@ -232,6 +233,14 @@ class Enemy(Entity):
             pass
         return texture
     
+    def convert_local_coords_to_global(self):
+        start_node = self.get_block_coords(self.get_entity_location(1))
+        end_node = self.get_block_coords(self.get_player_location())
+
+        start_pos = (start_node[0][0]*8 + start_node[1][0], start_node[0][1]*8 + start_node[1][1])
+        end_pos = (end_node[0][0]*8 + end_node[1][0], end_node[0][1]*8 + end_node[1][1])
+        return start_pos, end_pos
+        
     def get_offset_pos(self):
         pos = copy.copy(self.position)
         pos[0] += self.render.movement_horizontal * self.render.BLOCK_SIZE
@@ -271,8 +280,9 @@ class Enemy(Entity):
         can_move2 = self.raymarch_func(pos, (0, 1))
 
         if self.count % 100 == 0:
-            print(f"Start Node: {self.get_block_coords(self.get_entity_location(1))}")
-            print(f"End Node: {self.get_block_coords(self.get_player_location())}")
+            nodes = self.convert_local_coords_to_global()
+            print(f"Start Node: {nodes[0]}")
+            print(f"End Node: {nodes[1]}")
 
         if can_move1 == 0 or can_move2 == 0:
             self.ON_GROUND = True
