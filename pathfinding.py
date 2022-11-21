@@ -13,7 +13,7 @@ class ConnectionAssessor():
         chunk_x = pos[0] // 8
         chunk_y = pos[1] // 8
         if chunk_x > 0:
-            chunk_x = chunk_x *4
+            chunk_x = chunk_x * 4
         
         chunk = chunk_x + chunk_y
 
@@ -32,8 +32,9 @@ class ConnectionAssessor():
         #Left One Block
         blockcoordsleft = self.convert_pos_to_block_numbers((pos[0]-1, pos[1]))
         print(blockcoordsleft)
-        if self.render.LEVEL_MAP[blockcoordsleft[0]][blockcoordsleft[1]][blockcoordsleft[2]] in self.traversable_blocks:
-            return self.render.LEVEL_MAP[blockcoordsleft]
+        print(self.render.LEVEL_MAP_NUMBERS)
+        if self.render.LEVEL_MAP_NUMBERS[blockcoordsleft[0]][blockcoordsleft[1]][blockcoordsleft[2]] in self.traversable_blocks:
+            return self.render.LEVEL_MAP_NUMBERS[blockcoordsleft]
         return pos
 
 class Node():
