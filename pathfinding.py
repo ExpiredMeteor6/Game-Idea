@@ -18,9 +18,14 @@ class ConnectionAssessor():
         block_y = pos[1] % 8
         return chunk_x, chunk_y, block_x, block_y
    
-    def get_connected_nodes(self, pos):
+    def get_connected_nodes(self, pos, direction):
         #Left One Block
-        chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0]-1, pos[1]))
+        
+        if direction == left:
+            left_or_right = 1
+        elsif direction == right:
+            left_or_right = -1
+        chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0]-left_or_right, pos[1]))
        
         print(chunk_x,chunk_y,block_x,block_y)
         chunk = self.MAP[chunk_x*4+chunk_y]
