@@ -287,7 +287,7 @@ class Enemy(Entity):
             print(f"Start Node: {nodes[0]}")
             print(f"End Node: {nodes[1]}")
 
-            print(self.connectionassesor.get_connected_nodes(nodes[0], "left"))
+            print(self.connectionassesor.get_connected_nodes(nodes[0]))
 
 
         if can_move1 == 0 or can_move2 == 0:
