@@ -240,7 +240,7 @@ class Enemy(Entity):
         start_node = self.get_block_coords(self.get_entity_location(1))
         end_node = self.get_block_coords(self.get_player_location())
 
-        start_pos = (start_node[0][0]*8 + start_node[1][0], start_node[0][1]*8 + start_node[1][1])
+        start_pos = (start_node[0][0]*8 + start_node[1][0] + int(self.render.movement_horizontal), start_node[0][1]*8 + start_node[1][1] + int(self.render.movement_vertical))
         end_pos = (end_node[0][0]*8 + end_node[1][0], end_node[0][1]*8 + end_node[1][1])
         return start_pos, end_pos
         
