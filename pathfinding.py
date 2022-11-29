@@ -23,8 +23,9 @@ class ConnectionAssessor():
         
         if direction == "left":
             left_or_right = 1
-        #elif direction == "right":
-        #    left_or_right = -1
+        elif direction == "right":
+            left_or_right = -1
+            
         chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0]-left_or_right, pos[1]))
        
         print(chunk_x,chunk_y,block_x,block_y)
