@@ -31,7 +31,21 @@ class PathFinder():
             open_nodes.remove(current)
 
             current_connections = self.ConnectionAssessor.get_connected_nodes(current.nodepos)
-            
+
+            for item in current_connections:
+                node = Node(current, self.endpos, item)
+                added = False
+                for opennode in open_nodes:
+                    if node.nodepos == opennode.nodepos:
+                        added = True
+                        if node.h < opennode.h:
+                            open_nodes.remove(opennode)
+                            open_nodes.append(node)
+                        break
+                if added == False:
+                    open_nodes.append(node)
+
+
 
 
 class ConnectionAssessor():
