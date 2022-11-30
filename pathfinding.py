@@ -10,6 +10,7 @@ class PathFinder():
         self.ConnectionAssessor = ConnectionAssessor()
 
         self.startnode = Node(None, endpos, startpos)
+        self.route = []
     
     def find_route(self):
         open_nodes = [self.startnode]
@@ -27,6 +28,12 @@ class PathFinder():
             if current == None:
                 print("Path Finding Failed")
                 break
+
+            if current.nodepos == self.endpos:
+                while True:
+                    self.route.append(current.nodepos)
+                    '''this pos then parents then parents and so on, then reverse list'''
+
 
             open_nodes.remove(current)
 
