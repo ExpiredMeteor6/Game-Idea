@@ -8,6 +8,7 @@ import time
 import math
 from entities import Entity, Player, Enemy
 from button import Button
+from pathfinding import PathFinder
 
 pygame.init()
 clock = pygame.time.Clock()

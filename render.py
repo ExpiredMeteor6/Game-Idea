@@ -97,6 +97,7 @@ class Render:
         self.gravel_img = pygame.image.load('Images/gravel.png').convert()
         self.iron_ore_img = pygame.image.load('Images/iron_ore.png').convert()
         self.start_img = pygame.image.load('Images/start.png').convert()
+        self.testing_img = pygame.image.load('Images/testingblock.png').convert()
 
         self.grass_img = pygame.transform.scale(self.grass_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.air_img = pygame.transform.scale(self.air_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
@@ -105,6 +106,7 @@ class Render:
         self.gravel_img = pygame.transform.scale(self.gravel_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.iron_ore_img = pygame.transform.scale(self.iron_ore_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.start_img = pygame.transform.scale(self.start_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
+        self.testing_img = pygame.transform.scale(self.testing_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
 
         pygame.mixer.init()
         self.music = pygame.mixer.music
@@ -177,7 +179,9 @@ class Render:
                     elif block == 5:
                         place_img(self.start_img)
                         self.start_coords = (x, y)
-
+                    
+                    elif block == 6:
+                        place_img(self.testing_img)
                     x += 1
                 y += 1
     

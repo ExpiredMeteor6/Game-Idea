@@ -220,8 +220,8 @@ class Enemy(Entity):
         self.jump_decay = 0
         self.ON_GROUND = False
         self.downward_momentum = 0
+        self.route = []
         
-        self.connectionassesor = ConnectionAssessor()
     
     def get_texture(self):
         if self.state == 0:
@@ -236,13 +236,22 @@ class Enemy(Entity):
             pass
         return texture
     
-    def convert_local_coords_to_global(self):
-        start_node = self.get_block_coords(self.get_entity_location(1))
-        end_node = self.get_block_coords(self.get_player_location())
+    def convert_local_coords_to_global(self, move):
+        move = True
+        if move == True:
+            start_node = self.get_block_coords((self.get_entity_location(1)[0] + 16, self.get_entity_location(1)[1] + 16))
+            end_node = self.get_block_coords((self.get_entity_location(0)[0] + 16, self.get_entity_location(0)[1] + 16))
 
-        start_pos = (start_node[0][0]*8 + start_node[1][0] + int(self.render.movement_horizontal), start_node[0][1]*8 + start_node[1][1] + int(self.render.movement_vertical))
-        end_pos = (end_node[0][0]*8 + end_node[1][0] + int(self.render.movement_horizontal), end_node[0][1]*8 + end_node[1][1] + int(self.render.movement_vertical))
-        return start_pos, end_pos
+            start_pos = (start_node[0][0]*8 + start_node[1][0] + int(self.render.movement_horizontal), start_node[0][1]*8 + start_node[1][1] + int(self.render.movement_vertical))
+            end_pos = (end_node[0][0]*8 + end_node[1][0] + int(self.render.movement_horizontal), end_node[0][1]*8 + end_node[1][1] + int(self.render.movement_vertical))
+            return start_pos, end_pos
+        else:
+            start_node = self.get_block_coords(self.get_entity_location(1))
+            end_node = self.get_block_coords(self.get_player_location())
+
+            start_pos = (start_node[0][0]*8 + start_node[1][0] + int(self.render.movement_horizontal), start_node[0][1]*8 + start_node[1][1] + int(self.render.movement_vertical))
+            end_pos = (end_node[0][0]*8 + end_node[1][0] + int(self.render.movement_horizontal), end_node[0][1]*8 + end_node[1][1] + int(self.render.movement_vertical))
+            return start_pos, end_pos
         
     def get_offset_pos(self):
         pos = copy.copy(self.position)
@@ -270,7 +279,30 @@ class Enemy(Entity):
         if key == pygame.K_LEFT and self.moving == -1:
             self.moving = 0
 
+
     def tick(self):
+        if self.route == None:
+            pass
+        else:
+            print(self.route)
+            if len(self.route) > 0:
+                node = self.route[0]
+                start_end_nodes = self.convert_local_coords_to_global(True)
+                if node[0] < start_end_nodes[1][0]:
+                    self.moving = -1
+                if node[0] > start_end_nodes[1][0]:
+                    self.moving = 1
+                if node[1] > start_end_nodes[1][1]:
+                    if self.count_at_activation == 0 and self.ON_GROUND == True:
+                        self.JUMPING = True
+                        self.count_at_activation = self.count
+
+                if node == start_end_nodes[1]:
+                    print(f"reached {node}")
+                    self.route.remove(node)
+                    self.moving = 0
+
+
         self.count += 1
         
         pos = self.get_offset_pos()
@@ -283,11 +315,11 @@ class Enemy(Entity):
         can_move2 = self.raymarch_func(pos, (0, 1))
 
         if self.count % 100 == 0:
-            nodes = self.convert_local_coords_to_global()
+            nodes = self.convert_local_coords_to_global(False)
             print(f"Start Node: {nodes[0]}")
             print(f"End Node: {nodes[1]}")
 
-            print(self.connectionassesor.get_connected_nodes(nodes[0]))
+            self.route = PathFinder(nodes[0], nodes[1]).find_route()
 
 
         if can_move1 == 0 or can_move2 == 0:

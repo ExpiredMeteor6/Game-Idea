@@ -15,7 +15,12 @@ class PathFinder():
     def find_route(self):
         open_nodes = [self.startnode]
 
+        iterations = 0
         while True:
+            iterations += 1
+            if iterations > 1000:
+                print("Path Finding Out Of Range")
+                break
             current = None
             cheapest_node = None
 
@@ -24,16 +29,29 @@ class PathFinder():
                     cheapest_node = node
                 elif node.h < cheapest_node.h:
                     cheapest_node = node
+            current = cheapest_node
 
             if current == None:
                 print("Path Finding Failed")
                 break
 
             if current.nodepos == self.endpos:
+                node = current
                 while True:
-                    self.route.append(current.nodepos)
-                    '''this pos then parents then parents and so on, then reverse list'''
+                    if node.nodepos == self.startpos:
+                        self.route.append(node.nodepos)
+                        break
 
+                    self.route.append(node.nodepos)
+                    print(node.nodepos)
+                    
+                    
+                    '''this pos then parents then parents and so on, then reverse list'''
+                    node = node.parent
+                
+
+                return self.route[::-1]
+            
 
             open_nodes.remove(current)
 
@@ -41,17 +59,13 @@ class PathFinder():
 
             for item in current_connections:
                 node = Node(current, self.endpos, item)
-                added = False
                 for opennode in open_nodes:
                     if node.nodepos == opennode.nodepos:
-                        added = True
                         if node.h < opennode.h:
                             open_nodes.remove(opennode)
                             open_nodes.append(node)
                         break
-                if added == False:
-                    open_nodes.append(node)
-
+                open_nodes.append(node)
 
 
 
@@ -59,7 +73,7 @@ class ConnectionAssessor():
     def __init__(self):
         self.render = Render()
         self.MAP = File_Handler().load()
-        self.traversable_blocks = [0]
+        self.traversable_blocks = [0, 6]
    
     def convert_pos_to_block_numbers(self, pos):
         chunk_x = pos[0] // 8
@@ -80,7 +94,8 @@ class ConnectionAssessor():
         if block in self.traversable_blocks:
             connected_nodes.append((pos[0]-1, pos[1]))
         else:
-            print(f"Not a possible move - block: {block}")
+            pass
+            '''print(f"Not a possible move - block: {block}")'''
 
         # Check Right By One Block  
         chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0]+1, pos[1]))
@@ -107,7 +122,8 @@ class ConnectionAssessor():
         if block in self.traversable_blocks:
             connected_nodes.append((pos[0]+1, pos[1]))
         else:
-            print(f"Not a possible move - block: {block}")
+            pass
+            '''print(f"Not a possible move - block: {block}")'''
 
         # Check Down By One Block  
         chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0], pos[1]-1))
@@ -118,7 +134,8 @@ class ConnectionAssessor():
         if block in self.traversable_blocks:
             connected_nodes.append((pos[0], pos[1]-1))
         else:
-            print(f"Not a possible move - block: {block}")
+            '''print(f"Not a possible move - block: {block}")'''
+            pass
 
         # Check Up By One Block  
         chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0], pos[1]+1))
@@ -129,7 +146,8 @@ class ConnectionAssessor():
         if block in self.traversable_blocks:
             connected_nodes.append((pos[0], pos[1]+1))
         else:
-            print(f"Not a possible move - block: {block}")
+            '''print(f"Not a possible move - block: {block}")'''
+            pass
         
         return connected_nodes
 
