@@ -1,6 +1,7 @@
 import pygame
 from terrain_handler import Chunk
 from file_handler import File_Handler
+import math
 
 class Render:
     def __init__(self):
@@ -114,6 +115,8 @@ class Render:
         '''self.music.play(-1)'''
 
         grunt = pygame.mixer.Sound('Audio/Grunt_1.WAV')
+
+        self.font = pygame.font.SysFont(None, 12)
     
 
     def redraw_sky_level(self):
@@ -182,9 +185,14 @@ class Render:
                     
                     elif block == 6:
                         place_img(self.testing_img)
+                    
+                    
+                    img = self.font.render(f"{x + chunk.CHUNK_SIZE * chunk.x_y[0]}, {y + chunk.CHUNK_SIZE * chunk.x_y[1]}", True, (0, 0, 0))
+                    place_img(img)
+
                     x += 1
                 y += 1
-    
+
     def wipe(self):
         self.screen.fill((0,0,0))
     

@@ -36,7 +36,7 @@ def ray_march(current_position, direction):
     return pixels_traveled
 
 def get_player_location():
-    return game_entities[0].position
+    return game_entities[0].get_world_position()
 
 def get_entity_location(position_in_list):
     return game_entities[position_in_list].position

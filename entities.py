@@ -54,6 +54,8 @@ class Player(Entity):
         self.jump_decay = 0
         self.ON_GROUND = False
         self.downward_momentum = 0
+
+        self.render = render
     
     def get_texture(self):
         if self.state == 0:
@@ -67,6 +69,10 @@ class Player(Entity):
         else:
             pass
         return texture
+    
+    def get_world_position(self):
+        self.world_position = [self.position[0] - self.render.movement_horizontal, self.position[1] - self.render.movement_vertical]
+        return self.world_position
 
     def on_key_press(self, key):
         if key == pygame.K_d:
@@ -221,6 +227,7 @@ class Enemy(Entity):
         self.ON_GROUND = False
         self.downward_momentum = 0
         self.route = []
+        self.get_player_world_position = get_player_location
         
     
     def get_texture(self):
@@ -237,13 +244,14 @@ class Enemy(Entity):
         return texture
     
     def convert_local_coords_to_global(self, move):
+        print(self.get_player_world_position())
         move = True
         if move == True:
-            start_node = self.get_block_coords((self.get_entity_location(1)[0] + 16, self.get_entity_location(1)[1] + 16))
-            end_node = self.get_block_coords((self.get_entity_location(0)[0] + 16, self.get_entity_location(0)[1] + 16))
+            start_node = self.get_block_coords((self.get_entity_location(1)[0] + int(self.render.movement_horizontal) * self.render.BLOCK_SIZE + 16, self.get_entity_location(1)[1] + int(self.render.movement_vertical) * self.render.BLOCK_SIZE))
+            end_node = self.get_block_coords((self.get_player_world_position()[0] + int(self.render.movement_horizontal) + 16, self.get_player_world_position()[1] + int(self.render.movement_vertical)))
 
-            start_pos = (start_node[0][0]*8 + start_node[1][0] + int(self.render.movement_horizontal), start_node[0][1]*8 + start_node[1][1] + int(self.render.movement_vertical))
-            end_pos = (end_node[0][0]*8 + end_node[1][0] + int(self.render.movement_horizontal), end_node[0][1]*8 + end_node[1][1] + int(self.render.movement_vertical))
+            start_pos = (start_node[0][0]*8 + start_node[1][0], start_node[0][1]*8 + start_node[1][1])
+            end_pos = (end_node[0][0]*8 + end_node[1][0], end_node[0][1]*8 + end_node[1][1])
             return start_pos, end_pos
         else:
             start_node = self.get_block_coords(self.get_entity_location(1))
@@ -289,9 +297,9 @@ class Enemy(Entity):
                 node = self.route[0]
                 start_end_nodes = self.convert_local_coords_to_global(True)
                 if node[0] < start_end_nodes[1][0]:
-                    self.moving = -1
-                if node[0] > start_end_nodes[1][0]:
                     self.moving = 1
+                if node[0] > start_end_nodes[1][0]:
+                    self.moving = -1
                 if node[1] > start_end_nodes[1][1]:
                     if self.count_at_activation == 0 and self.ON_GROUND == True:
                         self.JUMPING = True
