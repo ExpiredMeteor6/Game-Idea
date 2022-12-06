@@ -1,5 +1,3 @@
-import pygame
-from render import Render
 from file_handler import File_Handler
 import math
 
@@ -11,6 +9,7 @@ class PathFinder():
 
         self.startnode = Node(None, endpos, startpos)
         self.route = []
+        self.done = False
     
     def find_route(self):
         open_nodes = [self.startnode]
@@ -20,6 +19,7 @@ class PathFinder():
             iterations += 1
             if iterations > 1000:
                 print("Path Finding Out Of Range")
+                self.done = True
                 break
             current = None
             cheapest_node = None
@@ -33,6 +33,7 @@ class PathFinder():
 
             if current == None:
                 print("Path Finding Failed")
+                self.done = True
                 break
 
             if current.nodepos == self.endpos:
@@ -49,7 +50,7 @@ class PathFinder():
                     '''this pos then parents then parents and so on, then reverse list'''
                     node = node.parent
                 
-
+                self.done = True
                 return self.route[::-1]
             
 
@@ -66,13 +67,20 @@ class PathFinder():
                             open_nodes.append(node)
                         break
                 open_nodes.append(node)
+        
+    
+    def is_done(self):
+        return self.done
 
 
 
 class ConnectionAssessor():
+    MAP = None
+
     def __init__(self):
-        self.render = Render()
-        self.MAP = File_Handler().load()
+        if ConnectionAssessor.MAP == None:
+            print("loading map")
+            ConnectionAssessor.MAP = File_Handler().load()
         self.traversable_blocks = [0, 6]
    
     def convert_pos_to_block_numbers(self, pos):
@@ -99,7 +107,7 @@ class ConnectionAssessor():
 
         # Check Right By One Block  
         chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0]+1, pos[1]))
-        chunk = self.MAP[chunk_x*4+chunk_y]
+        chunk = ConnectionAssessor.MAP[chunk_x*4+chunk_y]
         row = chunk[block_y]
         block = row[block_x]
 
@@ -127,7 +135,7 @@ class ConnectionAssessor():
 
         # Check Down By One Block  
         chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0], pos[1]-1))
-        chunk = self.MAP[chunk_x*4+chunk_y]
+        chunk = ConnectionAssessor.MAP[chunk_x*4+chunk_y]
         row = chunk[block_y]
         block = row[block_x]
 
@@ -139,7 +147,7 @@ class ConnectionAssessor():
 
         # Check Up By One Block  
         chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0], pos[1]+1))
-        chunk = self.MAP[chunk_x*4+chunk_y]
+        chunk = ConnectionAssessor.MAP[chunk_x*4+chunk_y]
         row = chunk[block_y]
         block = row[block_x]
 

@@ -79,6 +79,7 @@ class Render:
                                     ]
         self.file = File_Handler()
         self.LEVEL_MAP = []
+        self.SHOW_CHUNK_COORDS = False
 
         self.BLOCK_SIZE = 32
 
@@ -186,9 +187,9 @@ class Render:
                     elif block == 6:
                         place_img(self.testing_img)
                     
-                    
-                    img = self.font.render(f"{x + chunk.CHUNK_SIZE * chunk.x_y[0]}, {y + chunk.CHUNK_SIZE * chunk.x_y[1]}", True, (0, 0, 0))
-                    place_img(img)
+                    if self.SHOW_CHUNK_COORDS == True:
+                        img = self.font.render(f"{x + chunk.CHUNK_SIZE * chunk.x_y[0]}, {y + chunk.CHUNK_SIZE * chunk.x_y[1]}", True, (0, 0, 0))
+                        place_img(img)
 
                     x += 1
                 y += 1

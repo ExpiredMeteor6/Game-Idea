@@ -93,8 +93,10 @@ def Start_Screen():
                 if start_button.check_clicked(pygame.mouse.get_pos()) == True:
                     displayed = False
 
+        
         pygame.display.update()
         clock.tick(FRAME_RATE)
+        
 
 
 

@@ -3,6 +3,7 @@ import pygame
 import copy
 import time
 from pathfinding import PathFinder, Node, ConnectionAssessor
+from thread_handler import Threader
 
 class Entity:
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location):
@@ -12,6 +13,7 @@ class Entity:
         self.position = [x, y]
         self.get_block_coords = get_block_coords
         self.get_entity_location = get_entity_location
+
         
     
     def on_key_press(self, key):
@@ -228,6 +230,8 @@ class Enemy(Entity):
         self.downward_momentum = 0
         self.route = []
         self.get_player_world_position = get_player_location
+
+        self.pathfinder = None
         
     
     def get_texture(self):
@@ -244,7 +248,7 @@ class Enemy(Entity):
         return texture
     
     def convert_local_coords_to_global(self, move):
-        print(self.get_player_world_position())
+        #print(self.get_player_world_position())
         move = True
         if move == True:
             start_node = self.get_block_coords((self.get_entity_location(1)[0] + int(self.render.movement_horizontal) * self.render.BLOCK_SIZE + 16, self.get_entity_location(1)[1] + int(self.render.movement_vertical) * self.render.BLOCK_SIZE))
@@ -292,10 +296,11 @@ class Enemy(Entity):
         if self.route == None:
             pass
         else:
-            print(self.route)
+            #print(self.route)
             if len(self.route) > 0:
                 node = self.route[0]
                 start_end_nodes = self.convert_local_coords_to_global(True)
+
                 if node[0] < start_end_nodes[1][0]:
                     self.moving = 1
                     if self.state == 1 or self.state == 3:
@@ -313,6 +318,18 @@ class Enemy(Entity):
                     print(f"reached {node}")
                     self.route.remove(node)
                     self.moving = 0
+                
+
+
+                #relic either remove or develop later
+                '''print(node)
+                if node in self.route:
+                    print("test")
+                    pos_in_list = self.route.index(node)
+                    if pos_in_list > 0:
+                        for i in range(pos_in_list):
+                            print("skipped node")
+                            self.route.remove(self.route[0])'''
 
         self.count += 1
         
@@ -324,13 +341,20 @@ class Enemy(Entity):
         pos = self.get_offset_pos()
         pos[1] += 32
         can_move2 = self.raymarch_func(pos, (0, 1))
-
-        if self.count % 100 == 0:
+  
+        if self.pathfinder == None and self.count % 20 == 0:
             nodes = self.convert_local_coords_to_global(False)
+            #nodes = [(0, 0), (10, 10)]
             print(f"Start Node: {nodes[0]}")
             print(f"End Node: {nodes[1]}")
+            self.pathfinder = Threader(nodes[0], nodes[1])
+            self.pathfinder.start_thread()
 
-            self.route = PathFinder(nodes[0], nodes[1]).find_route()
+        if self.pathfinder != None:
+            if self.pathfinder.is_done():
+                self.route = self.pathfinder.get_result()
+                self.pathfinder.destroy()
+                self.pathfinder = None
 
 
         if can_move1 == 0 or can_move2 == 0:
