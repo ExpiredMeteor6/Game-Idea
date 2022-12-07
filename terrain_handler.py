@@ -9,6 +9,7 @@ class Chunk:
         self.CHUNK_SIZE = 8
         self.x_y = (0, 0)
         self.CHUNK = []
+        self.image = None
     
     def generate_chunk(self, x, y):
         self.x_y = (x, y)

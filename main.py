@@ -111,6 +111,7 @@ game_entities.append(Enemy(984, 100, render, ray_march, get_player_location, get
 #game_entities.append(Enemy(900, 100, render, ray_march, get_player_location))
 
 def Game_Screen():
+    render.find_start()
     running = True
 
     render.music.load('Audio/Timeless.mp3')

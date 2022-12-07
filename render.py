@@ -93,7 +93,7 @@ class Render:
         self.screen = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
         self.BG = pygame.image.load('Images/Background.png').convert()
 
-        '''self.grass_img = pygame.image.load('Images/grass.png').convert()
+        self.grass_img = pygame.image.load('Images/grass.png').convert()
         self.air_img = pygame.image.load('Images/air.png').convert()
         self.dirt_img = pygame.image.load('Images/dirt.png').convert()
         self.stone_img = pygame.image.load('Images/stone.png').convert()
@@ -109,9 +109,16 @@ class Render:
         self.gravel_img = pygame.transform.scale(self.gravel_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.iron_ore_img = pygame.transform.scale(self.iron_ore_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.start_img = pygame.transform.scale(self.start_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
-        self.testing_img = pygame.transform.scale(self.testing_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))'''
+        self.testing_img = pygame.transform.scale(self.testing_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
 
-        self.grass_img = Image.load ??????
+        '''self.grass_img = ('Images/grass.png')
+        self.air_img = ('Images/air.png')
+        self.dirt_img = ('Images/dirt.png')
+        self.stone_img = ('Images/stone.png')
+        self.gravel_img = ('Images/gravel.png')
+        self.iron_ore_img = ('Images/iron_ore.png')
+        self.start_img = ('Images/start.png')
+        self.testing_img = ('Images/testingblock.png')'''
 
         pygame.mixer.init()
         self.music = pygame.mixer.music
@@ -164,7 +171,7 @@ class Render:
     
     def draw_chunk(self, chunk_x, chunk_y):
         chunk = self.LEVEL_MAP[chunk_x*4+chunk_y]
-        image = None 
+        image = chunk.image
         if image is None:
             new_image = Image.new('RGB',(8 * self.BLOCK_SIZE ,8 * self.BLOCK_SIZE), (250,250,250))
             y = 0
@@ -195,7 +202,6 @@ class Render:
                     
                     elif block == 5:
                         place_img(self.start_img)
-                        self.start_coords = (x, y)
                     
                     elif block == 6:
                         place_img(self.testing_img)
@@ -203,7 +209,26 @@ class Render:
                 y += 1
             '''new_image.show()'''
 
-        self.screen.blit(self.convert_pil_image_to_pygame(new_image), (chunk_x * 8 * self.BLOCK_SIZE, chunk_y * 8 * self.BLOCK_SIZE))
+            chunk.image = self.convert_pil_image_to_pygame(new_image)
+        else:
+            self.screen.blit(image, (chunk_x * 8 * self.BLOCK_SIZE + self.movement_horizontal * self.BLOCK_SIZE, chunk_y * 8 * self.BLOCK_SIZE + self.movement_vertical * self.BLOCK_SIZE))
+
+
+    def find_start(self):
+        for chunk in self.LEVEL_MAP:
+            y = 0
+            for row in chunk.CHUNK:
+                x = 0
+                for block in row:
+                    
+                    if block == 5:
+                        self.start_coords = (x, y)
+                    
+                    else:
+                        pass
+
+                    x += 1
+                y += 1
 
     def draw_level(self):
         for chunk in self.LEVEL_MAP:
