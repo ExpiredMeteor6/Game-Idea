@@ -128,6 +128,7 @@ class Render:
         grunt = pygame.mixer.Sound('Audio/Grunt_1.WAV')
 
         self.font = pygame.font.SysFont(None, 12)
+        self.music_volume = 1
     
 
     def redraw_sky_level(self):

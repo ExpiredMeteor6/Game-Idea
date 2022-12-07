@@ -13,7 +13,6 @@ class Threader:
         self.thread.start()
 
     def is_done(self):
-        print(self.pathfinder.is_done())
         return self.pathfinder.is_done()
 
     def get_result(self):

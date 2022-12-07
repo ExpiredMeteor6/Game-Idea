@@ -175,7 +175,7 @@ class Player(Entity):
             if min(can_move1, can_move2) >= 8:
                 self.render.movement_horizontal -= self.moving / 4
 
-        if self.moving != 0 and self.count % 3 == 0:
+        if self.moving != 0 and self.count % 20 == 0:
             self.bounce()
         
         if self.moving == 0:
@@ -420,7 +420,7 @@ class Enemy(Entity):
             if min(can_move1, can_move2) >= 8:
                 self.position[0] -= 8
         
-        if self.moving != 0 and self.count % 3 == 0:
+        if self.moving != 0 and self.count % 20 == 0:
             self.bounce()
         
         if self.moving == 0:

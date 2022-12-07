@@ -12,7 +12,7 @@ from pathfinding import PathFinder
 
 pygame.init()
 clock = pygame.time.Clock()
-FRAME_RATE = 144
+FRAME_RATE = 30
 
 pygame.display.set_caption('Terrain Test')
 
@@ -70,37 +70,6 @@ def get_block_coords(position):
     return chunk_coords, block_within_chunk_coords
 
 
-def Start_Screen():
-    displayed = True
-    render.screen.blit(render.BG, (0,0))
-
-    render.music.load('Audio/Time.mp3')
-    '''render.music.play(-1)'''
-
-    start_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Start", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
-
-    while displayed:
-        start_button.change_button_colour(pygame.mouse.get_pos())
-        start_button.button_update()
-    
-
-
-        for event in pygame.event.get():
-            # Check for QUIT event      
-            if event.type == pygame.QUIT:
-                displayed = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if start_button.check_clicked(pygame.mouse.get_pos()) == True:
-                    displayed = False
-
-        
-        pygame.display.update()
-        clock.tick(FRAME_RATE)
-        
-
-
-
-Start_Screen()
 
 game_entities = []
 game_entities.append(Player(1024, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
@@ -115,7 +84,7 @@ def Game_Screen():
     running = True
 
     render.music.load('Audio/Timeless.mp3')
-    '''render.music.play(-1)'''
+    render.music.play(-1)
 
     count = 0
     while running:
@@ -166,4 +135,94 @@ def Game_Screen():
         clock.tick(FRAME_RATE)
         #print(clock.get_fps())
 
-Game_Screen()
+def Options_Screen():
+    displayed = True
+    render.screen.blit(render.BG, (0,0))
+
+    volume_up_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "+", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
+    volume_down_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "-", (render.WINDOW_WIDTH/2 + 150,render.WINDOW_HEIGHT/2))
+
+    back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (render.WINDOW_WIDTH/2 ,render.WINDOW_HEIGHT/2 + 150))
+
+    while displayed:
+        volume_up_button.change_button_colour(pygame.mouse.get_pos())
+        volume_up_button.button_update()
+
+        volume_down_button.change_button_colour(pygame.mouse.get_pos())
+        volume_down_button.button_update()
+
+        back_button.change_button_colour(pygame.mouse.get_pos())
+        back_button.button_update()
+
+        for event in pygame.event.get():
+            # Check for QUIT event      
+            if event.type == pygame.QUIT:
+                displayed = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if volume_up_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    if render.music_volume >= 1:
+                        pass
+                    else:
+                        render.music_volume += 0.1
+                        render.music.set_volume(render.music_volume)
+                        print(f"UP {render.music_volume}")
+                if volume_down_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    if render.music_volume <= 0.1:
+                        pass
+                    else:
+                        render.music_volume -= 0.1
+                        render.music.set_volume(render.music_volume)
+                        print(f"DOWN {render.music_volume}")
+                
+                if back_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    Start_Screen()
+                    displayed = False
+
+        pygame.display.update()
+        clock.tick(FRAME_RATE)
+
+def Start_Screen():
+    displayed = True
+    render.screen.blit(render.BG, (0,0))
+
+    start_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Start", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
+    options_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Options", (render.WINDOW_WIDTH/2 - 150,render.WINDOW_HEIGHT/2 + 150))
+
+    while displayed:
+        start_button.change_button_colour(pygame.mouse.get_pos())
+        start_button.button_update()
+
+        options_button.change_button_colour(pygame.mouse.get_pos())
+        options_button.button_update()
+
+
+    
+
+
+        for event in pygame.event.get():
+            # Check for QUIT event      
+            if event.type == pygame.QUIT:
+                displayed = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if start_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    displayed = False
+                    Game_Screen()
+                if options_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    Options_Screen()
+                    displayed = False
+
+        
+        pygame.display.update()
+        clock.tick(FRAME_RATE)
+
+def Level_Selection_Screen():
+    pass
+
+def Help_Screen():
+    pass
+
+
+render.music.load('Audio/Time.mp3')
+render.music.set_volume(render.music_volume)
+render.music.play(-1)
+Start_Screen()
