@@ -345,8 +345,6 @@ class Enemy(Entity):
         if self.pathfinder == None and self.count % 20 == 0:
             nodes = self.convert_local_coords_to_global(False)
             #nodes = [(0, 0), (10, 10)]
-            print(f"Start Node: {nodes[0]}")
-            print(f"End Node: {nodes[1]}")
             self.pathfinder = Threader(nodes[0], nodes[1])
             self.pathfinder.start_thread()
 

@@ -44,7 +44,7 @@ class PathFinder():
                         break
 
                     self.route.append(node.nodepos)
-                    print(node.nodepos)
+                    '''print(node.nodepos)'''
                     
                     
                     '''this pos then parents then parents and so on, then reverse list'''
@@ -79,7 +79,6 @@ class ConnectionAssessor():
 
     def __init__(self):
         if ConnectionAssessor.MAP == None:
-            print("loading map")
             ConnectionAssessor.MAP = File_Handler().load()
         self.traversable_blocks = [0, 6]
    
