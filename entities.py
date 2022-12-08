@@ -322,14 +322,38 @@ class Enemy(Entity):
 
 
                 #relic either remove or develop later
-                '''print(node)
-                if node in self.route:
-                    print("test")
-                    pos_in_list = self.route.index(node)
-                    if pos_in_list > 0:
-                        for i in range(pos_in_list):
-                            print("skipped node")
-                            self.route.remove(self.route[0])'''
+                '''
+                else:
+                    print(node)
+                    if start_end_nodes[1] in self.route:
+                        print("test")
+                        pos_in_list = self.route.index(node)
+                        print(f"Pos_in_list = {pos_in_list}")
+                        if pos_in_list > 0:
+                            for i in range(pos_in_list):
+                                print("skipped node")
+                                self.route.remove(self.route[0])
+                    else:
+                        if node[0] < start_end_nodes[1][0]:
+                            self.moving = 1
+                            if self.state == 1 or self.state == 3:
+                                self.state = 0
+                        if node[0] > start_end_nodes[1][0]:
+                            self.moving = -1
+                            if self.state == 0 or self.state == 2:
+                                self.state = 1
+                        if node[1] > start_end_nodes[1][1]:
+                            if self.count_at_activation == 0 and self.ON_GROUND == True:
+                                self.JUMPING = True
+                                self.count_at_activation = self.count
+
+                        if node == start_end_nodes[1]:
+                            print(f"correction reached {node}")
+                            self.route.remove(node)
+                            self.moving = 0
+                            '''
+
+                                
 
         self.count += 1
         
