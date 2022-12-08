@@ -301,15 +301,15 @@ class Enemy(Entity):
                 node = self.route[0]
                 start_end_nodes = self.convert_local_coords_to_global(True)
 
-                if node[0] < start_end_nodes[1][0]:
+                if start_end_nodes[0][0] < start_end_nodes[1][0]:
                     self.moving = 1
                     if self.state == 1 or self.state == 3:
                         self.state = 0
-                if node[0] > start_end_nodes[1][0]:
+                if start_end_nodes[0][0] > start_end_nodes[1][0]:
                     self.moving = -1
                     if self.state == 0 or self.state == 2:
                         self.state = 1
-                if node[1] > start_end_nodes[1][1]:
+                if start_end_nodes[0][1] > start_end_nodes[1][1]:
                     if self.count_at_activation == 0 and self.ON_GROUND == True:
                         self.JUMPING = True
                         self.count_at_activation = self.count
@@ -318,7 +318,7 @@ class Enemy(Entity):
                     print(f"reached {node}")
                     self.route.remove(node)
                     self.moving = 0
-                
+
 
 
                 #relic either remove or develop later
@@ -352,6 +352,7 @@ class Enemy(Entity):
                             self.route.remove(node)
                             self.moving = 0
                             '''
+                            
 
                                 
 

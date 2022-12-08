@@ -73,10 +73,10 @@ def get_block_coords(position):
 game_entities = []
 game_entities.append(Player(1024, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 game_entities.append(Enemy(984, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
-#game_entities.append(Enemy(960, 100, render, ray_march, get_player_location))
-#game_entities.append(Enemy(940, 100, render, ray_march, get_player_location))
-#game_entities.append(Enemy(920, 100, render, ray_march, get_player_location))
-#game_entities.append(Enemy(900, 100, render, ray_march, get_player_location))
+#game_entities.append(Enemy(960, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
+#game_entities.append(Enemy(940, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
+#game_entities.append(Enemy(920, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
+#game_entities.append(Enemy(900, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 
 
 def Game_Screen():

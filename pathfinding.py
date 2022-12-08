@@ -111,26 +111,38 @@ class ConnectionAssessor():
         block = row[block_x]
 
         #possibly work on this later on
-        '''if block in self.traversable_blocks:
+        if block in self.traversable_blocks:
             result = True
             count = 1
-            while pos[1]-count >= 0 and result == True:
-                chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0]+1, pos[1]-count))
+            while pos[1]+count >= 0 and result == True:
+                chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0]+1, pos[1]+count))
                 chunk = self.MAP[chunk_x*4+chunk_y]
                 row = chunk[block_y]
                 block = row[block_x]
 
+                #print(f"block {block}")
+                #print(pos[0]+1, pos[1]+count)
+
                 if block in self.traversable_blocks:
-                    pass
                     count += 1
+
                 else:
                     connected_nodes.append((pos[0]+1, pos[1]))
-                    result = False '''
+                    result = False 
+                    count = 1
+            if pos[1]+count >= 0:
+                #print("Not going down there bozo")
+                pass
+        else:
+            connected_nodes.append((pos[0]+1, pos[1]))
+            result = False 
+
+        '''
         if block in self.traversable_blocks:
             connected_nodes.append((pos[0]+1, pos[1]))
         else:
             pass
-            '''print(f"Not a possible move - block: {block}")'''
+                print(f"Not a possible move - block: {block}")'''
 
         # Check Down By One Block  
         chunk_x,chunk_y,block_x,block_y = self.convert_pos_to_block_numbers((pos[0], pos[1]-1))
