@@ -2,10 +2,10 @@ from file_handler import File_Handler
 import math
 
 class PathFinder():
-    def __init__(self, startpos, endpos):
+    def __init__(self, startpos, endpos, level):
         self.startpos = startpos
         self.endpos = endpos
-        self.ConnectionAssessor = ConnectionAssessor()
+        self.ConnectionAssessor = ConnectionAssessor(level)
 
         self.startnode = Node(None, endpos, startpos)
         self.route = []
@@ -75,11 +75,14 @@ class PathFinder():
 
 
 class ConnectionAssessor():
+    def __init__(self, level):
+        self.level = level
+
     MAP = None
 
     def __init__(self):
         if ConnectionAssessor.MAP == None:
-            ConnectionAssessor.MAP = File_Handler().load()
+            ConnectionAssessor.MAP = File_Handler().load(self.level)
         self.traversable_blocks = [0, 6]
    
     def convert_pos_to_block_numbers(self, pos):

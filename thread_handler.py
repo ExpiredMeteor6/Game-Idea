@@ -5,8 +5,8 @@ import time
 from pathfinding import PathFinder
 
 class Threader:
-    def __init__(self, startpos, endpos):
-        self.pathfinder = PathFinder(startpos, endpos)
+    def __init__(self, startpos, endpos, level):
+        self.pathfinder = PathFinder(startpos, endpos, level)
 
     def start_thread(self):
         self.thread = threading.Thread(target=self.pathfinder.find_route, name = "PathFinder")

@@ -6,7 +6,7 @@ from pathfinding import PathFinder, Node, ConnectionAssessor
 from thread_handler import Threader
 
 class Entity:
-    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location):
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level):
         self.render = render
         self.get_player_location = get_player_location
         self.raymarch_func = raymarch_func
@@ -29,8 +29,8 @@ class Entity:
         pass
 
 class Player(Entity):
-    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location):
-        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location)
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level):
+        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level)
         
         self.Player_Size = 32
 
@@ -205,8 +205,8 @@ class Cloud(Entity):
         pass
 
 class Enemy(Entity):
-    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location):
-        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location)
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level):
+        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level)
         self.Player_Size = 32
 
         self.enemy_img_right = pygame.image.load('Images/red_blob_right.png')
@@ -232,6 +232,7 @@ class Enemy(Entity):
         self.get_player_world_position = get_player_location
 
         self.pathfinder = None
+        self.level = level
         
     
     def get_texture(self):
@@ -370,7 +371,7 @@ class Enemy(Entity):
         if self.pathfinder == None and self.count % 20 == 0:
             nodes = self.convert_local_coords_to_global(False)
             #nodes = [(0, 0), (10, 10)]
-            self.pathfinder = Threader(nodes[0], nodes[1])
+            self.pathfinder = Threader(nodes[0], nodes[1], self.level)
             self.pathfinder.start_thread()
 
         if self.pathfinder != None:

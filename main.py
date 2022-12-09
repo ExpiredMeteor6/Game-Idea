@@ -23,7 +23,6 @@ render = Render()
 for i in range(len(render.LEVEL_MAP_NUMBERS)):
     render.level_row()
 
-render.convert_map_list_to_level(render.file.load())
 mode = "Level"
 
 def ray_march(current_position, direction):
@@ -70,20 +69,23 @@ def get_block_coords(position):
     return chunk_coords, block_within_chunk_coords
 
 
-game_entities = []
-game_entities.append(Player(1024, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
-game_entities.append(Enemy(984, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
+
 #game_entities.append(Enemy(960, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 #game_entities.append(Enemy(940, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 #game_entities.append(Enemy(920, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 #game_entities.append(Enemy(900, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 
+game_entities = []
 
-def Game_Screen():
+def Game_Screen(level):
+    render.convert_map_list_to_level(render.file.load(level))
     render.find_start()
     running = True
 
-    render.music.load('Audio/Timeless.mp3')
+    game_entities.append(Player(1024, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location, level))
+    game_entities.append(Enemy(984, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location, level))
+
+    render.music.load('Audio/Time.mp3')
     render.music.play(-1)
 
     count = 0
@@ -205,8 +207,8 @@ def Start_Screen():
                 displayed = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    Level_Selection_Screen()
                     displayed = False
-                    Game_Screen()
                 if options_button.check_clicked(pygame.mouse.get_pos()) == True:
                     Options_Screen()
                     displayed = False
@@ -216,7 +218,47 @@ def Start_Screen():
         clock.tick(FRAME_RATE)
 
 def Level_Selection_Screen():
-    pass
+    displayed = True
+    render.screen.blit(render.BG, (0,0))
+
+    back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (render.WINDOW_WIDTH/2-200,render.WINDOW_HEIGHT/2))
+    
+    level_1 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 1", (render.WINDOW_WIDTH/2-200,render.WINDOW_HEIGHT/2))
+    level_2 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 2", (render.WINDOW_WIDTH/2 - 150,render.WINDOW_HEIGHT/2))
+    
+
+    while displayed:
+        back_button.change_button_colour(pygame.mouse.get_pos())
+        back_button.button_update()
+
+        level_1.change_button_colour(pygame.mouse.get_pos())
+        level_1.button_update()
+
+        level_2.change_button_colour(pygame.mouse.get_pos())
+        level_2.button_update()
+
+
+    
+
+
+        for event in pygame.event.get():
+            # Check for QUIT event      
+            if event.type == pygame.QUIT:
+                displayed = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    Start_Screen()
+                    displayed = False
+                if level_1.check_clicked(pygame.mouse.get_pos()) == True:
+                    Game_Screen(0)
+                    displayed = False
+                if level_2.check_clicked(pygame.mouse.get_pos()) == True:
+                    Options_Screen()
+                    displayed = False
+
+        
+        pygame.display.update()
+        clock.tick(FRAME_RATE)
 
 def Help_Screen():
     pass
