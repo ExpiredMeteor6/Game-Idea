@@ -242,6 +242,7 @@ class Enemy(Entity):
         self.pathfinder = None
         self.level = level
         self.dead = False
+        self.movement_pixels = 6
         
     
     def get_texture(self):
@@ -446,8 +447,8 @@ class Enemy(Entity):
             pos[0] += 32
             pos[1] += 31
             can_move2 = self.raymarch_func(pos, (1, 0))
-            if min(can_move1, can_move2) >= 8:
-                self.position[0] += 8
+            if min(can_move1, can_move2) >= self.movement_pixels:
+                self.position[0] += self.movement_pixels
 
         if self.moving == -1:
             pos = self.get_offset_pos()
@@ -456,8 +457,8 @@ class Enemy(Entity):
             pos = self.get_offset_pos()
             pos[1] += 31
             can_move2 = self.raymarch_func(pos, (-1, 0))
-            if min(can_move1, can_move2) >= 8:
-                self.position[0] -= 8
+            if min(can_move1, can_move2) >= self.movement_pixels:
+                self.position[0] -= self.movement_pixels
         
         if self.moving != 0 and self.count % 20 == 0:
             self.bounce()
