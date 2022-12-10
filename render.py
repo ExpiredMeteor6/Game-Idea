@@ -103,6 +103,7 @@ class Render:
         self.finish_img = pygame.image.load('Images/end.png').convert()
         self.stone_background_img = pygame.image.load('Images/stone_background.png').convert()
         self.stone_background_start_img = pygame.image.load('Images/start_stone.png').convert()
+        self.dirt_background_img = pygame.image.load('Images/dirt_background.png').convert()
 
         self.grass_img = pygame.transform.scale(self.grass_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.air_img = pygame.transform.scale(self.air_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
@@ -114,6 +115,7 @@ class Render:
         self.finish_img = pygame.transform.scale(self.finish_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.stone_background_img = pygame.transform.scale(self.stone_background_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.stone_background_start_img = pygame.transform.scale(self.stone_background_start_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
+        self.dirt_background_img = pygame.transform.scale(self.dirt_background_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
 
         '''self.grass_img = ('Images/grass.png')
         self.air_img = ('Images/air.png')
@@ -134,7 +136,7 @@ class Render:
         self.font = pygame.font.SysFont(None, 12)
         self.music_volume = 1
 
-        self.traversable_blocks = [0, 5, 6, 7, 8]
+        self.traversable_blocks = [0, 5, 6, 7, 8, 9]
 
     def redraw_sky_level(self):
         for chunk in self.LEVEL_MAP:
@@ -218,6 +220,9 @@ class Render:
                     elif block == 8:
                         place_img(self.stone_background_start_img)
                     
+                    elif block == 9:
+                        place_rotated_img(self.dirt_background_img)
+                    
 
 
                 y += 1
@@ -250,6 +255,38 @@ class Render:
 
                         self.start_coords[1] = chunk_coords[1] * 8 + block_coords[1]
                         self.start_coords[0] = chunk_coords[0] * 8 + block_coords[0]
+
+                        return
+                    
+                    else:
+                        pass
+
+                    block_within_row += 1
+                row_within_chunk += 1
+            chunk_num += 1
+    
+    def find_finish(self):
+        chunk_num = 0
+        for chunk in self.LEVEL_MAP:
+            row_within_chunk = 0
+            for row in chunk.CHUNK:
+                block_within_row = 0
+                for block in row:
+                    
+                    if block == 6:
+                        chunk_row_block = [chunk_num, row_within_chunk, block_within_row]
+                        self.finish_coords = [0, 0]
+
+                        chunk_coords = [0, 0]
+                        chunk_coords[0] += chunk_row_block[0] // 4
+                        chunk_coords[1] += chunk_row_block[0] % 4
+
+                        block_coords = [0, 0]
+                        block_coords[0] += block_within_row
+                        block_coords[1] += row_within_chunk
+
+                        self.finish_coords[1] = chunk_coords[1] * 8 + block_coords[1]
+                        self.finish_coords[0] = chunk_coords[0] * 8 + block_coords[0]
 
                         return
                     

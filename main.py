@@ -15,6 +15,7 @@ clock = pygame.time.Clock()
 FRAME_RATE = 30
 
 blob_img = pygame.transform.scale(pygame.image.load('Images/blob_right.png'), (32,32))
+full_size_blob = pygame.transform.scale(pygame.image.load('Images/blob_right.png'), (320,320))
 crying_blob_img = pygame.transform.scale(pygame.image.load('Images/blob_crying.png'), (320,320))
 
 pygame.display.set_caption("The Adventures of Lil' Herb")
@@ -84,6 +85,7 @@ level_music = {0 : "Audio/Time.mp3",
 def Game_Screen(level):
     render.convert_map_list_to_level(render.file.load(level))
     render.find_start()
+    render.find_finish()
     running = True
 
     game_entities.append(Player(1024, render.start_coords[1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, level))
@@ -116,7 +118,10 @@ def Game_Screen(level):
                     game_entities.clear()
                     Level_Failed_Screen(level)
                     running = False
-                
+                elif entity.finished == True:
+                    game_entities.clear()
+                    Level_Completed_Screen(level)
+                    running = False
                 else:
                     render.screen.blit(texture, position)
                 
@@ -383,6 +388,43 @@ def Level_Failed_Screen(level):
                     Start_Screen()
                     displayed = False
                 if retry_level.check_clicked(pygame.mouse.get_pos()) == True:
+                    Game_Screen(level)
+                    displayed = False
+
+
+        
+        pygame.display.update()
+        clock.tick(FRAME_RATE)
+
+def Level_Completed_Screen(level):
+    displayed = True
+    render.screen.blit(render.BG, (0,0))
+
+    back_to_main_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back To Main Menu", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 300))
+    play_level_again = Button(render, (0,0,205), (0,0,139), (0,0,0), "Play Level Again", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 150))
+    
+    blob = Display_Image(render, full_size_blob, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
+    title = Text(render, (0,0,205), "Level Completed!", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
+    
+    while displayed:
+        back_to_main_button.change_button_colour(pygame.mouse.get_pos())
+        back_to_main_button.button_update()
+
+        play_level_again.change_button_colour(pygame.mouse.get_pos())
+        play_level_again.button_update()
+
+        title.paste_text()
+        blob.paste_img()
+
+        for event in pygame.event.get():
+            # Check for QUIT event      
+            if event.type == pygame.QUIT:
+                displayed = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_to_main_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    Start_Screen()
+                    displayed = False
+                if play_level_again.check_clicked(pygame.mouse.get_pos()) == True:
                     Game_Screen(level)
                     displayed = False
 

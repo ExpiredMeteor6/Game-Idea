@@ -60,7 +60,9 @@ class Player(Entity):
         self.render = render
 
         self.dead = False
-    
+        self.finish_coords = self.render.finish_coords
+        self.finished = False
+
     def get_texture(self):
         if self.state == 0:
             texture = self.player_img_right
@@ -102,10 +104,21 @@ class Player(Entity):
         if key == pygame.K_a and self.moving == -1:
             self.moving = 0
     
+    def convert_local_coords_to_global(self):
+        node = self.get_block_coords((self.get_world_position()[0] + int(self.render.movement_horizontal) + 16, self.get_world_position()[1] + int(self.render.movement_vertical)))
+        end_node = [node[0][0]*8 + node[1][0], node[0][1]*8 + node[1][1]]
+        return end_node
+
+    def check_reached_finish(self):
+        if self.convert_local_coords_to_global() == self.finish_coords:
+            self.finished = True
+    
     def tick(self):
         self.count += 1
 
         self.is_dead()
+        self.check_reached_finish()
+
         
         pos = copy.copy(self.position)
         pos[0] += 30
