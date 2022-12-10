@@ -7,14 +7,15 @@ from render import Render
 import time
 import math
 from entities import Entity, Player, Enemy
-from button import Button
+from ui import Button, Image_Button, Text
 from pathfinding import PathFinder
 
 pygame.init()
 clock = pygame.time.Clock()
 FRAME_RATE = 30
 
-pygame.display.set_caption('Terrain Test')
+pygame.display.set_caption("The Adventures of Lil' Herb")
+pygame.display.set_icon(pygame.image.load('Images/blob_right.png'))
 
 
 render = Render()
@@ -141,12 +142,17 @@ def Options_Screen():
     displayed = True
     render.screen.blit(render.BG, (0,0))
 
-    volume_up_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "+", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
-    volume_down_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "-", (render.WINDOW_WIDTH/2 + 150,render.WINDOW_HEIGHT/2))
+    volume_up_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "+", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 200))
+    volume_down_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "-", (render.WINDOW_WIDTH/2 + 150,render.WINDOW_HEIGHT/2 - 200))
 
-    back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (render.WINDOW_WIDTH/2 ,render.WINDOW_HEIGHT/2 + 150))
+    back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (150,100))
+
+    title = Text(render, (0,0,205), "Options:", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
+    volume = Text(render, (0,0,205), f"Volume: {int(render.music_volume * 10)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 200))
 
     while displayed:
+        render.screen.blit(render.BG, (0,0))
+
         volume_up_button.change_button_colour(pygame.mouse.get_pos())
         volume_up_button.button_update()
 
@@ -155,6 +161,9 @@ def Options_Screen():
 
         back_button.change_button_colour(pygame.mouse.get_pos())
         back_button.button_update()
+
+        title.paste_text()
+        volume.paste_text()
 
         for event in pygame.event.get():
             # Check for QUIT event      
@@ -167,14 +176,15 @@ def Options_Screen():
                     else:
                         render.music_volume += 0.1
                         render.music.set_volume(render.music_volume)
-                        print(f"UP {render.music_volume}")
+                        volume = Text(render, (0,0,205), f"Volume: {int(render.music_volume * 10)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 200))
+
                 if volume_down_button.check_clicked(pygame.mouse.get_pos()) == True:
                     if render.music_volume <= 0.1:
                         pass
                     else:
                         render.music_volume -= 0.1
                         render.music.set_volume(render.music_volume)
-                        print(f"DOWN {render.music_volume}")
+                        volume = Text(render, (0,0,205), f"Volume: {int(render.music_volume * 10)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 200))
                 
                 if back_button.check_clicked(pygame.mouse.get_pos()) == True:
                     Start_Screen()
@@ -187,8 +197,11 @@ def Start_Screen():
     displayed = True
     render.screen.blit(render.BG, (0,0))
 
-    start_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Start", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
+    game_title = Text(render, (0,0,205), "The Adventures of Lil' Herb", 120, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
+    start_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Play", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
     options_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Options", (render.WINDOW_WIDTH/2 - 150,render.WINDOW_HEIGHT/2 + 150))
+    help_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Help", (render.WINDOW_WIDTH/2 + 125,render.WINDOW_HEIGHT/2 + 150))
+
 
     while displayed:
         start_button.change_button_colour(pygame.mouse.get_pos())
@@ -197,9 +210,10 @@ def Start_Screen():
         options_button.change_button_colour(pygame.mouse.get_pos())
         options_button.button_update()
 
+        help_button.change_button_colour(pygame.mouse.get_pos())
+        help_button.button_update()
 
-    
-
+        game_title.paste_text()
 
         for event in pygame.event.get():
             # Check for QUIT event      
@@ -212,6 +226,9 @@ def Start_Screen():
                 if options_button.check_clicked(pygame.mouse.get_pos()) == True:
                     Options_Screen()
                     displayed = False
+                if help_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    Help_Screen()
+                    displayed = False
 
         
         pygame.display.update()
@@ -221,10 +238,12 @@ def Level_Selection_Screen():
     displayed = True
     render.screen.blit(render.BG, (0,0))
 
-    back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (render.WINDOW_WIDTH/2-200,render.WINDOW_HEIGHT/2))
+    back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (150,100))
     
-    level_1 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 1", (render.WINDOW_WIDTH/2-200,render.WINDOW_HEIGHT/2))
-    level_2 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 2", (render.WINDOW_WIDTH/2 - 150,render.WINDOW_HEIGHT/2))
+    level_1 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 1", (render.WINDOW_WIDTH/2 - 400,render.WINDOW_HEIGHT/2 - 250))
+    level_2 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 2", (render.WINDOW_WIDTH/2 - 400,render.WINDOW_HEIGHT/2 - 150))
+
+    title = Text(render, (0,0,205), "Level Selection:", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
     
 
     while displayed:
@@ -237,7 +256,7 @@ def Level_Selection_Screen():
         level_2.change_button_colour(pygame.mouse.get_pos())
         level_2.button_update()
 
-
+        title.paste_text()
     
 
 
@@ -261,6 +280,57 @@ def Level_Selection_Screen():
         clock.tick(FRAME_RATE)
 
 def Help_Screen():
+    displayed = True
+    render.screen.blit(render.BG, (0,0))
+
+    back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (150,100))
+    
+    #image_test = Image_Button(render, pygame.image.load('Images/grass.png').convert(), (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
+    
+    title = Text(render, (0,0,205), "How to play:", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
+    subtitle_movement = Text(render, (0,0,205), "Movement:", 60, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 200))
+    movement_text_right = Text(render, (0,0,205), "Right: press and hold the 'D' key", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
+    movement_text_left = Text(render, (0,0,205), "Left: press and hold the 'A' key", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 100))
+    movement_text_jump = Text(render, (0,0,205), "Jump: press and release the 'SPACE' key", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 50))
+    subtitle_objective = Text(render, (0,0,205), "Objective:", 60, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 50))
+    main_objective = Text(render, (0,0,205), "The main goal of the game, is to reach the finish line while avoiding dangers", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 100))
+    dangers = Text(render, (0,0,205), "Dangers consist of endlessly deep pits and enemy characters", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 150))
+    enemies = Text(render, (0,0,205), "Enemies will try to stop you from completing the level by attacking you", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 200))
+    finish_line = Text(render, (0,0,205), "Reach the finish line to complete the level and unlock the next one", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 250))
+
+    while displayed:
+        back_button.change_button_colour(pygame.mouse.get_pos())
+        back_button.button_update()
+
+        #image_test.button_update()
+        title.paste_text()
+        subtitle_movement.paste_text()
+        movement_text_right.paste_text()
+        movement_text_left.paste_text()
+        movement_text_jump.paste_text()
+        subtitle_objective.paste_text()
+        main_objective.paste_text()
+        dangers.paste_text()
+        enemies.paste_text()
+        finish_line.paste_text()
+
+        for event in pygame.event.get():
+            # Check for QUIT event      
+            if event.type == pygame.QUIT:
+                displayed = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    Start_Screen()
+                    displayed = False
+                #if image_test.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Game_Screen(0)
+                    #displayed = False
+
+        
+        pygame.display.update()
+        clock.tick(FRAME_RATE)
+
+def Level_Failed_Screen():
     pass
 
 

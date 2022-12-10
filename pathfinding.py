@@ -75,14 +75,11 @@ class PathFinder():
 
 
 class ConnectionAssessor():
-    def __init__(self, level):
-        self.level = level
-
     MAP = None
 
-    def __init__(self):
+    def __init__(self, level):
         if ConnectionAssessor.MAP == None:
-            ConnectionAssessor.MAP = File_Handler().load(self.level)
+            ConnectionAssessor.MAP = File_Handler().load(level)
         self.traversable_blocks = [0, 6]
    
     def convert_pos_to_block_numbers(self, pos):
