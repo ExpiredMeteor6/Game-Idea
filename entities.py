@@ -58,6 +58,8 @@ class Player(Entity):
         self.downward_momentum = 0
 
         self.render = render
+
+        self.dead = False
     
     def get_texture(self):
         if self.state == 0:
@@ -72,6 +74,10 @@ class Player(Entity):
             pass
         return texture
     
+    def is_dead(self):
+        if self.position[1] >= 1000:
+            self.dead = True
+
     def get_world_position(self):
         self.world_position = [self.position[0] - self.render.movement_horizontal, self.position[1] - self.render.movement_vertical]
         return self.world_position
@@ -98,6 +104,8 @@ class Player(Entity):
     
     def tick(self):
         self.count += 1
+
+        self.is_dead()
         
         pos = copy.copy(self.position)
         pos[0] += 30
@@ -233,6 +241,7 @@ class Enemy(Entity):
 
         self.pathfinder = None
         self.level = level
+        self.dead = False
         
     
     def get_texture(self):
@@ -247,6 +256,10 @@ class Enemy(Entity):
         else:
             pass
         return texture
+    
+    def is_dead(self):
+        if self.position[1] >= 1000:
+            self.dead = True
     
     def convert_local_coords_to_global(self, move):
         #print(self.get_player_world_position())
@@ -319,6 +332,8 @@ class Enemy(Entity):
                     print(f"reached {node}")
                     self.route.remove(node)
                     self.moving = 0
+                
+            
 
 
 
@@ -353,9 +368,7 @@ class Enemy(Entity):
                             self.route.remove(node)
                             self.moving = 0
                             '''
-                            
-
-                                
+        self.is_dead()
 
         self.count += 1
         

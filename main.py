@@ -7,16 +7,18 @@ from render import Render
 import time
 import math
 from entities import Entity, Player, Enemy
-from ui import Button, Image_Button, Text
+from ui import Button, Image_Button, Text, Display_Image
 from pathfinding import PathFinder
 
 pygame.init()
 clock = pygame.time.Clock()
 FRAME_RATE = 30
 
-pygame.display.set_caption("The Adventures of Lil' Herb")
-pygame.display.set_icon(pygame.image.load('Images/blob_right.png'))
+blob_img = pygame.transform.scale(pygame.image.load('Images/blob_right.png'), (32,32))
+crying_blob_img = pygame.transform.scale(pygame.image.load('Images/blob_crying.png'), (320,320))
 
+pygame.display.set_caption("The Adventures of Lil' Herb")
+pygame.display.set_icon(blob_img)
 
 render = Render()
 
@@ -90,6 +92,9 @@ def Game_Screen(level):
     render.music.play(-1)
 
     count = 0
+
+    render.movement_horizontal = 0
+
     while running:
         if count == 0:
             render.draw_level()
@@ -108,10 +113,21 @@ def Game_Screen(level):
             position = entity.position
 
             if entity == game_entities[0]: 
-                render.screen.blit(texture, position)
+                if entity.dead == True:
+                    game_entities.clear()
+                    Level_Failed_Screen(level)
+                    running = False
+                
+                else:
+                    render.screen.blit(texture, position)
+                
             else:
                 '''print((entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))'''
-                render.screen.blit(texture, (entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))
+                if entity.dead == True:
+                    game_entities.remove(entity)
+                    print("Entity removed")
+                else:
+                    render.screen.blit(texture, (entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))
             
         for entity in game_entities:
             entity.tick()
@@ -129,7 +145,7 @@ def Game_Screen(level):
             if event.type == pygame.KEYUP:
                 for entity in game_entities:
                     entity.on_key_release(event.key)
-            
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pass
                 
@@ -200,7 +216,10 @@ def Start_Screen():
     game_title = Text(render, (0,0,205), "The Adventures of Lil' Herb", 120, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
     start_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Play", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
     options_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Options", (render.WINDOW_WIDTH/2 - 150,render.WINDOW_HEIGHT/2 + 150))
-    help_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Help", (render.WINDOW_WIDTH/2 + 125,render.WINDOW_HEIGHT/2 + 150))
+    help_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Help", (render.WINDOW_WIDTH/2 + 175,render.WINDOW_HEIGHT/2 + 150))
+    quit_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Quit", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 300))
+
+    blob = Display_Image(render, blob_img, (render.WINDOW_WIDTH/2 - 740,render.WINDOW_HEIGHT/2 - 404))
 
 
     while displayed:
@@ -213,7 +232,11 @@ def Start_Screen():
         help_button.change_button_colour(pygame.mouse.get_pos())
         help_button.button_update()
 
+        quit_button.change_button_colour(pygame.mouse.get_pos())
+        quit_button.button_update()
+
         game_title.paste_text()
+        blob.paste_img()
 
         for event in pygame.event.get():
             # Check for QUIT event      
@@ -228,6 +251,8 @@ def Start_Screen():
                     displayed = False
                 if help_button.check_clicked(pygame.mouse.get_pos()) == True:
                     Help_Screen()
+                    displayed = False
+                if quit_button.check_clicked(pygame.mouse.get_pos()) == True:
                     displayed = False
 
         
@@ -330,8 +355,42 @@ def Help_Screen():
         pygame.display.update()
         clock.tick(FRAME_RATE)
 
-def Level_Failed_Screen():
-    pass
+def Level_Failed_Screen(level):
+    displayed = True
+    render.screen.blit(render.BG, (0,0))
+
+    back_to_main_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back To Main Menu", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 300))
+    retry_level = Button(render, (0,0,205), (0,0,139), (0,0,0), "Retry Level", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 150))
+    
+    crying_blob = Display_Image(render, crying_blob_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
+    title = Text(render, (255,0,0), "Level Failed! You Died!", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
+    
+    while displayed:
+        back_to_main_button.change_button_colour(pygame.mouse.get_pos())
+        back_to_main_button.button_update()
+
+        retry_level.change_button_colour(pygame.mouse.get_pos())
+        retry_level.button_update()
+
+        title.paste_text()
+        crying_blob.paste_img()
+
+        for event in pygame.event.get():
+            # Check for QUIT event      
+            if event.type == pygame.QUIT:
+                displayed = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_to_main_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    Start_Screen()
+                    displayed = False
+                if retry_level.check_clicked(pygame.mouse.get_pos()) == True:
+                    Game_Screen(level)
+                    displayed = False
+
+
+        
+        pygame.display.update()
+        clock.tick(FRAME_RATE)
 
 
 render.music.load('Audio/Time.mp3')

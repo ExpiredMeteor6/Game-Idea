@@ -65,3 +65,17 @@ class Text():
 
     def paste_text(self):
         self.screen.blit(self.text, self.rect)
+
+class Display_Image():
+    def __init__(self, render, image, pos):
+        self.render = render
+        self.screen = self.render.screen
+        self.image = image
+        self.x_pos = pos[0]
+        self.y_pos = pos[1]
+        self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+    
+    def paste_img(self):
+        self.screen.blit(self.image, self.rect)
+    
+    
