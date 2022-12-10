@@ -100,7 +100,9 @@ class Render:
         self.gravel_img = pygame.image.load('Images/gravel.png').convert()
         self.iron_ore_img = pygame.image.load('Images/iron_ore.png').convert()
         self.start_img = pygame.image.load('Images/start.png').convert()
-        self.testing_img = pygame.image.load('Images/testingblock.png').convert()
+        self.finish_img = pygame.image.load('Images/end.png').convert()
+        self.stone_background_img = pygame.image.load('Images/stone_background.png').convert()
+        self.stone_background_start_img = pygame.image.load('Images/start_stone.png').convert()
 
         self.grass_img = pygame.transform.scale(self.grass_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.air_img = pygame.transform.scale(self.air_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
@@ -109,7 +111,9 @@ class Render:
         self.gravel_img = pygame.transform.scale(self.gravel_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.iron_ore_img = pygame.transform.scale(self.iron_ore_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.start_img = pygame.transform.scale(self.start_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
-        self.testing_img = pygame.transform.scale(self.testing_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
+        self.finish_img = pygame.transform.scale(self.finish_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
+        self.stone_background_img = pygame.transform.scale(self.stone_background_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
+        self.stone_background_start_img = pygame.transform.scale(self.stone_background_start_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
 
         '''self.grass_img = ('Images/grass.png')
         self.air_img = ('Images/air.png')
@@ -129,7 +133,8 @@ class Render:
 
         self.font = pygame.font.SysFont(None, 12)
         self.music_volume = 1
-    
+
+        self.traversable_blocks = [0, 5, 6, 7, 8]
 
     def redraw_sky_level(self):
         for chunk in self.LEVEL_MAP:
@@ -205,7 +210,15 @@ class Render:
                         place_img(self.start_img)
                     
                     elif block == 6:
-                        place_img(self.testing_img)
+                        place_img(self.finish_img)
+                    
+                    elif block == 7:
+                        place_rotated_img(self.stone_background_img)
+                    
+                    elif block == 8:
+                        place_img(self.stone_background_start_img)
+                    
+
 
                 y += 1
             '''new_image.show()'''
@@ -216,20 +229,38 @@ class Render:
 
 
     def find_start(self):
+        chunk_num = 0
         for chunk in self.LEVEL_MAP:
-            y = 0
+            row_within_chunk = 0
             for row in chunk.CHUNK:
-                x = 0
+                block_within_row = 0
                 for block in row:
                     
-                    if block == 5:
-                        self.start_coords = (x, y)
+                    if block == 5 or block == 8:
+                        chunk_row_block = [chunk_num, row_within_chunk, block_within_row]
+                        self.start_coords = [0, 0]
+
+                        chunk_coords = [0, 0]
+                        chunk_coords[0] += chunk_row_block[0] // 4
+                        chunk_coords[1] += chunk_row_block[0] % 4
+
+                        block_coords = [0, 0]
+                        block_coords[0] += block_within_row
+                        block_coords[1] += row_within_chunk
+
+                        self.start_coords[1] = chunk_coords[1] * 8 + block_coords[1]
+                        self.start_coords[0] = chunk_coords[0] * 8 + block_coords[0]
+
+                        return
                     
                     else:
                         pass
 
-                    x += 1
-                y += 1
+                    block_within_row += 1
+                row_within_chunk += 1
+            chunk_num += 1
+
+            
 
     def draw_level(self):
         for chunk in self.LEVEL_MAP:

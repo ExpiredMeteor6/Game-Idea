@@ -80,7 +80,7 @@ class ConnectionAssessor():
     def __init__(self, level):
         if ConnectionAssessor.MAP == None:
             ConnectionAssessor.MAP = File_Handler().load(level)
-        self.traversable_blocks = [0, 6]
+        self.traversable_blocks = [0, 5, 6, 7, 8]
    
     def convert_pos_to_block_numbers(self, pos):
         chunk_x = pos[0] // 8

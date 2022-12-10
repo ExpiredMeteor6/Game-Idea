@@ -31,7 +31,7 @@ mode = "Level"
 def ray_march(current_position, direction):
     pixels_traveled = 0
     max_pixels = 16
-    while (get_block(current_position) == 0 or get_block(current_position) == 5) and pixels_traveled <= max_pixels:
+    while (get_block(current_position) in render.traversable_blocks) and pixels_traveled <= max_pixels:
         pixels_traveled += 1
         current_position[0] += direction[0]
         current_position[1] += direction[1]
@@ -79,26 +79,26 @@ def get_block_coords(position):
 #game_entities.append(Enemy(900, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 
 game_entities = []
-
+level_music = {0 : "Audio/Time.mp3",
+                1 : "Audio/Darkness.mp3"}
 def Game_Screen(level):
     render.convert_map_list_to_level(render.file.load(level))
     render.find_start()
     running = True
 
-    game_entities.append(Player(1024, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location, level))
+    game_entities.append(Player(1024, render.start_coords[1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, level))
     game_entities.append(Enemy(984, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location, level))
 
-    render.music.load('Audio/Time.mp3')
+    render.music.load(level_music[level])
     render.music.play(-1)
 
     count = 0
 
-    render.movement_horizontal = 0
+    render.movement_horizontal = -render.start_coords[0] + 32
 
     while running:
         if count == 0:
             render.draw_level()
-            render.movement_horizontal += render.start_coords[1] * 32
             render.draw_level()
             
         count += 1
@@ -107,7 +107,6 @@ def Game_Screen(level):
         #render.redraw_sky()
         render.wipe()
         render.draw_level()
-
         for entity in game_entities:
             texture = entity.get_texture()
             position = entity.position
@@ -297,7 +296,7 @@ def Level_Selection_Screen():
                     Game_Screen(0)
                     displayed = False
                 if level_2.check_clicked(pygame.mouse.get_pos()) == True:
-                    Options_Screen()
+                    Game_Screen(1)
                     displayed = False
 
         
