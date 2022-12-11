@@ -77,9 +77,35 @@ def get_block_coords(position):
 #game_entities.append(Enemy(920, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 #game_entities.append(Enemy(900, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 
+
 game_entities = []
 level_music = {0 : "Audio/Time.mp3",
                 1 : "Audio/Darkness.mp3"}
+
+def check_entity_collisions():
+    for entity in game_entities:
+        if entity.entity_type == "Player":
+            pos = [entity.position[0] + render.movement_horizontal * -32, entity.position[1]]
+        else:
+            pos = [entity.position[0], entity.position[1]]
+        for other_entity in game_entities:
+            if entity != other_entity:
+                if other_entity.entity_type == "Player":
+                    other_pos = [other_entity.position[0] + render.movement_horizontal * -32, other_entity.position[1]]
+                else:
+                    other_pos = [other_entity.position[0],  other_entity.position[1]]
+
+                if within_5_px(pos, other_pos):
+                    entity.on_collide(other_entity)
+                    other_entity.on_collide(entity)
+
+def within_5_px(entity1, entity2):
+    print(abs(entity1[0] - entity2[0]), abs(entity1[1] - entity2[1]))
+    if abs(entity1[0] - entity2[0]) < 10 and abs(entity1[1] - entity2[1]) < 10:
+        return True
+    else:
+        False
+        
 def Game_Screen(level):
     render.convert_map_list_to_level(render.file.load(level))
     render.find_start()
@@ -102,7 +128,7 @@ def Game_Screen(level):
             render.draw_level()
             
         count += 1
-        
+        check_entity_collisions()
         #RESET sky every frame
         #render.redraw_sky()
         render.wipe()

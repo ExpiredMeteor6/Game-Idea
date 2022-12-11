@@ -16,6 +16,7 @@ class Entity:
         self.level = level
         self.traversable_blocks = self.render.traversable_blocks
         self.get_block = get_block
+        self.dead = False
         
     
     def on_key_press(self, key):
@@ -29,7 +30,10 @@ class Entity:
 
     def tick(self):
         pass
-
+    
+    def on_collide(self, entity):
+       pass
+        
 class Player_Projectile(Entity):
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
         super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level)
@@ -49,6 +53,8 @@ class Player_Projectile(Entity):
         self.gravity = 0
         self.state = 0
         self.count_since_contact = 0
+
+        self.entity_type = "Projectile"
     
     def get_texture(self):
         if self.state == 0:
@@ -104,6 +110,10 @@ class Player_Projectile(Entity):
                 self.count_since_contact += 1
         else:
             self.move()
+    
+    def on_collide(self, entity):
+        if entity.entity_type == "Enemy":
+            entity.dead = True
 
 class Player(Entity):
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
@@ -144,6 +154,8 @@ class Player(Entity):
         self.shoot = False
         self.time_till_next_shot = 15
         self.count_since_death = 0
+
+        self.entity_type = "Player"
 
     def get_texture(self):
         if self.state == 0:
@@ -224,6 +236,13 @@ class Player(Entity):
         if self.convert_local_coords_to_global() == self.finish_coords:
             self.finished = True
     
+    def on_collide(self, entity):
+        if entity.entity_type == "Enemy":
+            if self.state == 0 or self.state == 2:
+                self.state = 4
+            else:
+                self.state = 5
+    
     def tick(self):
         self.count += 1
 
@@ -301,6 +320,8 @@ class Player(Entity):
         if self.moving == 1:
             pos = copy.copy(self.position)
             pos[0] += 32
+            #11 because blob is 22 pixels tall, tiles are 32, so 10 + 1
+            pos[1] += 11
             can_move1 = self.raymarch_func(pos, (1, 0))
 
             pos = copy.copy(self.position)
@@ -312,6 +333,8 @@ class Player(Entity):
 
         if self.moving == -1:
             pos = copy.copy(self.position)
+            #11 because blob is 22 pixels tall, tiles are 32, so 10 + 1
+            pos[1] += 11
             can_move1 = self.raymarch_func(pos, (-1, 0))
 
             pos = copy.copy(self.position)
@@ -380,6 +403,8 @@ class Enemy(Entity):
         self.level = level
         self.dead = False
         self.movement_pixels = 6
+
+        self.entity_type = "Enemy"
         
     
     def get_texture(self):
@@ -443,6 +468,9 @@ class Enemy(Entity):
         if key == pygame.K_LEFT and self.moving == -1:
             self.moving = 0
 
+    def on_collide(self, entity):
+        if entity.entity_type == "Projectile":
+            entity.made_contact = True
 
     def tick(self):
         if self.route == None:
