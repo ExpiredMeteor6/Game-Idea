@@ -13,6 +13,8 @@ class Entity:
         self.position = [x, y]
         self.get_block_coords = get_block_coords
         self.get_entity_location = get_entity_location
+        self.level = level
+        self.traversable_blocks = self.render.traversable_blocks
 
         
     
@@ -28,6 +30,46 @@ class Entity:
     def tick(self):
         pass
 
+class Player_Projectile(Entity):
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level):
+        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level)
+
+        self.Player_Size = 32
+
+        self.blue_projectile = pygame.image.load('Images/blue_projectile.png')
+        self.blue_projectile = pygame.transform.scale(self.blue_projectile, (self.Player_Size, self.Player_Size))
+
+        self.dead = False
+        self.direction = False
+
+        self.count = 0
+    
+    def get_texture(self):
+        return self.blue_projectile
+    
+    def is_dead(self):
+        block_coords = self.get_block_coords(self.position)
+        print(block_coords)
+        block = self.render.LEVEL_MAP[block_coords[0][0] * 4 + block_coords[0][1]].CHUNK[block_coords[1][1]][block_coords[1][1]]
+        print(block)
+
+        if block in self.traversable_blocks:
+            pass
+        else:
+            self.dead = True
+
+    def move(self):
+        if self.direction == False:
+            self.position[0] -= 4
+        else:
+            self.position[0] += 4
+    
+    def tick(self):
+        self.count += 1
+        self.is_dead()
+        if self.count % 5 == 0:
+            self.move()
+
 class Player(Entity):
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level):
         super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level)
@@ -41,13 +83,12 @@ class Player(Entity):
         self.player_img_left = pygame.image.load('Images/blob_left.png')
         self.player_img_down_right = pygame.image.load('Images/blob_down_right.png')
         self.player_img_down_left = pygame.image.load('Images/blob_down_left.png')
-        #self.blue_projectile = pygame.image.load('Images/blue_projectile.png')
+        
 
         self.player_img_right = pygame.transform.scale(self.player_img_right, (self.Player_Size, self.Player_Size))
         self.player_img_left = pygame.transform.scale(self.player_img_left, (self.Player_Size, self.Player_Size))
         self.player_img_down_right = pygame.transform.scale(self.player_img_down_right, (self.Player_Size, self.Player_Size))
         self.player_img_down_left = pygame.transform.scale(self.player_img_down_left, (self.Player_Size, self.Player_Size))
-        #self.blue_projectile = pygame.transform.scale(self.blue_projectile, (self.Player_Size, self.Player_Size))
 
         self.state = 0
         self.count = 0
@@ -62,6 +103,7 @@ class Player(Entity):
         self.dead = False
         self.finish_coords = self.render.finish_coords
         self.finished = False
+        self.shoot = False
 
     def get_texture(self):
         if self.state == 0:
@@ -97,6 +139,15 @@ class Player(Entity):
             if self.count_at_activation == 0 and self.ON_GROUND == True:
                 self.JUMPING = True
                 self.count_at_activation = self.count
+    
+    def on_mouse_button_click(self, mouse_button):
+        if mouse_button == 1:
+            self.shoot = False
+            if self.shoot == True:
+                return False
+            else:
+                self.shoot = True
+                return self.shoot
         
     def on_key_release(self, key):
         if key == pygame.K_d and self.moving == 1:
@@ -322,7 +373,7 @@ class Enemy(Entity):
 
     def tick(self):
         if self.route == None:
-            pass
+            self.moving = 0
         else:
             #print(self.route)
             if len(self.route) > 0:

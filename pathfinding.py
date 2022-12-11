@@ -20,7 +20,8 @@ class PathFinder():
             if iterations > 1000:
                 print("Path Finding Out Of Range")
                 self.done = True
-                break
+                self.route = None
+                return self.route
             current = None
             cheapest_node = None
 
@@ -34,8 +35,9 @@ class PathFinder():
             if current == None:
                 print("Path Finding Failed")
                 self.done = True
-                break
-
+                self.route = None
+                return self.route
+                
             if current.nodepos == self.endpos:
                 node = current
                 while True:

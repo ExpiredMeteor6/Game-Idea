@@ -6,7 +6,7 @@ import sys
 from render import Render
 import time
 import math
-from entities import Entity, Player, Enemy
+from entities import Entity, Player, Enemy, Player_Projectile
 from ui import Button, Image_Button, Text, Display_Image
 from pathfinding import PathFinder
 
@@ -151,7 +151,18 @@ def Game_Screen(level):
                     entity.on_key_release(event.key)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pass
+                if game_entities[0].on_mouse_button_click(event.button) == True:
+                    if game_entities[0].state == 0 or game_entities[0].state == 2:
+                        projectile = Player_Projectile(game_entities[0].position[0] - render.movement_horizontal * render.BLOCK_SIZE + 8, game_entities[0].position[1] + 6, render, ray_march, get_player_location, get_block_coords, get_entity_location, level)
+                        #RIGHT
+                        projectile.direction = True
+                        game_entities.append(projectile)
+                    else:
+                        projectile = Player_Projectile(game_entities[0].position[0] - render.movement_horizontal * render.BLOCK_SIZE - 8, game_entities[0].position[1] + 6, render, ray_march, get_player_location, get_block_coords, get_entity_location, level)
+                        #LEFT
+                        projectile.direction = False
+                        game_entities.append(projectile)
+                
                 
         
         pygame.display.update()
