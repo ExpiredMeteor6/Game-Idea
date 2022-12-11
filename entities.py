@@ -118,12 +118,15 @@ class Player(Entity):
         self.player_img_left = pygame.image.load('Images/blob_left.png')
         self.player_img_down_right = pygame.image.load('Images/blob_down_right.png')
         self.player_img_down_left = pygame.image.load('Images/blob_down_left.png')
+        self.player_img_right_explosion = pygame.image.load('Images/blob_right_explosion.png')
+        self.player_img_left_explosion = pygame.image.load('Images/blob_left_explosion.png')
         
 
         self.player_img_right = pygame.transform.scale(self.player_img_right, (self.Player_Size, self.Player_Size))
         self.player_img_left = pygame.transform.scale(self.player_img_left, (self.Player_Size, self.Player_Size))
         self.player_img_down_right = pygame.transform.scale(self.player_img_down_right, (self.Player_Size, self.Player_Size))
         self.player_img_down_left = pygame.transform.scale(self.player_img_down_left, (self.Player_Size, self.Player_Size))
+        self.player_img_left_explosion = pygame.transform.scale(self.player_img_left_explosion, (self.Player_Size, self.Player_Size))
 
         self.state = 0
         self.count = 0
@@ -140,6 +143,7 @@ class Player(Entity):
         self.finished = False
         self.shoot = False
         self.time_till_next_shot = 15
+        self.count_since_death = 0
 
     def get_texture(self):
         if self.state == 0:
@@ -150,6 +154,10 @@ class Player(Entity):
             texture = self.player_img_down_right
         if self.state == 3:
             texture = self.player_img_down_left
+        if self.state == 4:
+            texture = self.player_img_right_explosion
+        if self.state == 5:
+            texture = self.player_img_left_explosion
         else:
             pass
         return texture
@@ -157,9 +165,14 @@ class Player(Entity):
     def is_dead(self):
         if self.position[1] >= 1000:
             self.dead = True
+
         self.get_world_position()
-        if self.get_block(self.world_position) in self.render.killing_blocks:
-            self.dead = True
+        if self.get_block([self.world_position[0] + self.render.movement_horizontal, self.world_position[1]]) in self.render.killing_blocks:
+            if self.state == 0 or self.state == 2:
+                self.state = 4
+            else:
+                self.state = 5
+            
 
     def get_world_position(self):
         self.world_position = [self.position[0] - self.render.movement_horizontal, self.position[1] - self.render.movement_vertical]
@@ -167,17 +180,26 @@ class Player(Entity):
 
     def on_key_press(self, key):
         if key == pygame.K_d:
-            self.moving = 1
-            if self.state == 1 or self.state == 3:
-                self.state = 0
+            if self.state == 4 or self.state == 5:
+                pass
+            else:
+                self.moving = 1
+                if self.state == 1 or self.state == 3:
+                    self.state = 0
         if key == pygame.K_a:
-            self.moving = -1
-            if self.state == 0 or self.state == 2:
-                self.state = 1
+            if self.state == 4 or self.state == 5:
+                pass
+            else:
+                self.moving = -1
+                if self.state == 0 or self.state == 2:
+                    self.state = 1
         if key == pygame.K_SPACE:
-            if self.count_at_activation == 0 and self.ON_GROUND == True:
-                self.JUMPING = True
-                self.count_at_activation = self.count
+            if self.state == 4 or self.state == 5:
+                pass
+            else:
+                if self.count_at_activation == 0 and self.ON_GROUND == True:
+                    self.JUMPING = True
+                    self.count_at_activation = self.count
     
     def on_mouse_button_click(self, mouse_button):
         if mouse_button == 1:
@@ -207,6 +229,12 @@ class Player(Entity):
 
         self.is_dead()
         self.check_reached_finish()
+
+        if self.state == 4 or self.state == 5:
+            if self.count_since_death == 10:
+                self.dead = True
+            else:
+                self.count_since_death += 1
 
         
         pos = copy.copy(self.position)
