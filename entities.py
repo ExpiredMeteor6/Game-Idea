@@ -6,7 +6,7 @@ from pathfinding import PathFinder, Node, ConnectionAssessor
 from thread_handler import Threader
 
 class Entity:
-    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level):
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
         self.render = render
         self.get_player_location = get_player_location
         self.raymarch_func = raymarch_func
@@ -15,7 +15,7 @@ class Entity:
         self.get_entity_location = get_entity_location
         self.level = level
         self.traversable_blocks = self.render.traversable_blocks
-
+        self.get_block = get_block
         
     
     def on_key_press(self, key):
@@ -31,48 +31,83 @@ class Entity:
         pass
 
 class Player_Projectile(Entity):
-    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level):
-        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level)
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
+        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level)
 
         self.Player_Size = 32
 
         self.blue_projectile = pygame.image.load('Images/blue_projectile.png')
         self.blue_projectile = pygame.transform.scale(self.blue_projectile, (self.Player_Size, self.Player_Size))
+        self.blue_projectile_splat = pygame.image.load('Images/blue_projectile_splat.png')
+        self.blue_projectile_splat = pygame.transform.scale(self.blue_projectile_splat, (self.Player_Size, self.Player_Size))
 
         self.dead = False
+        self.made_contact = False
         self.direction = False
 
         self.count = 0
+        self.gravity = 0
+        self.state = 0
+        self.count_since_contact = 0
     
     def get_texture(self):
-        return self.blue_projectile
-    
-    def is_dead(self):
-        block_coords = self.get_block_coords(self.position)
-        print(block_coords)
-        block = self.render.LEVEL_MAP[block_coords[0][0] * 4 + block_coords[0][1]].CHUNK[block_coords[1][1]][block_coords[1][1]]
-        print(block)
-
-        if block in self.traversable_blocks:
-            pass
+        if self.state == 0:
+            return self.blue_projectile
         else:
-            self.dead = True
+            return self.blue_projectile_splat
+    
+    def made_contact_with_block(self):
+        if self.direction == True:
+            block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE + 24, self.position[1] + 8])
+            if block in self.traversable_blocks:
+                pass
+            else:
+                self.made_contact = True
+            
+            block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE + 24, self.position[1] + 24])
+            if block in self.traversable_blocks:
+                pass
+            else:
+                self.made_contact = True
+            
+        else:
+            block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE, self.position[1] + 8])
+            if block in self.traversable_blocks:
+                pass
+            else:
+                self.made_contact = True
+            
+            block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE, self.position[1] + 24])
+            if block in self.traversable_blocks:
+                pass
+            else:
+                self.made_contact = True
 
     def move(self):
         if self.direction == False:
-            self.position[0] -= 4
+            self.position[0] -= 10
         else:
-            self.position[0] += 4
+            self.position[0] += 10
+        self.position[1] += self.gravity
     
     def tick(self):
         self.count += 1
-        self.is_dead()
-        if self.count % 5 == 0:
+        if self.count % 2 == 0:
+            self.gravity += 0.5
+
+        self.made_contact_with_block()
+        if self.made_contact == True:
+            self.state = 1
+            if self.count_since_contact == 4:
+                self.dead = True
+            else:
+                self.count_since_contact += 1
+        else:
             self.move()
 
 class Player(Entity):
-    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level):
-        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level)
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
+        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level)
         
         self.Player_Size = 32
 
@@ -104,6 +139,7 @@ class Player(Entity):
         self.finish_coords = self.render.finish_coords
         self.finished = False
         self.shoot = False
+        self.time_till_next_shot = 15
 
     def get_texture(self):
         if self.state == 0:
@@ -142,7 +178,6 @@ class Player(Entity):
     
     def on_mouse_button_click(self, mouse_button):
         if mouse_button == 1:
-            self.shoot = False
             if self.shoot == True:
                 return False
             else:
@@ -179,6 +214,13 @@ class Player(Entity):
         pos = copy.copy(self.position)
         pos[1] += 32
         can_move2 = self.raymarch_func(pos, (0, 1))
+
+        if self.shoot == True:
+            if self.time_till_next_shot == 0:
+                self.shoot = False
+                self.time_till_next_shot = 15
+            else:
+                self.time_till_next_shot -= 1
 
         if can_move1 == 0 or can_move2 == 0:
             self.ON_GROUND = True
@@ -277,8 +319,8 @@ class Cloud(Entity):
         pass
 
 class Enemy(Entity):
-    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level):
-        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, level)
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
+        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block,level)
         self.Player_Size = 32
 
         self.enemy_img_right = pygame.image.load('Images/red_blob_right.png')

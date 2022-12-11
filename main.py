@@ -72,8 +72,6 @@ def get_block_coords(position):
     block_within_chunk_coords = (int((actual_x_pos / 8 - chunk_coords[0]) * 8), int((actual_y_pos / 8 - chunk_coords[1]) * 8))
     return chunk_coords, block_within_chunk_coords
 
-
-
 #game_entities.append(Enemy(960, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 #game_entities.append(Enemy(940, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
 #game_entities.append(Enemy(920, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
@@ -88,8 +86,8 @@ def Game_Screen(level):
     render.find_finish()
     running = True
 
-    game_entities.append(Player(1024, render.start_coords[1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, level))
-    game_entities.append(Enemy(984, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location, level))
+    game_entities.append(Player(1024, render.start_coords[1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level))
+    game_entities.append(Enemy(984, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level))
 
     render.music.load(level_music[level])
     render.music.play(-1)
@@ -153,12 +151,12 @@ def Game_Screen(level):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if game_entities[0].on_mouse_button_click(event.button) == True:
                     if game_entities[0].state == 0 or game_entities[0].state == 2:
-                        projectile = Player_Projectile(game_entities[0].position[0] - render.movement_horizontal * render.BLOCK_SIZE + 8, game_entities[0].position[1] + 6, render, ray_march, get_player_location, get_block_coords, get_entity_location, level)
+                        projectile = Player_Projectile(game_entities[0].position[0] - render.movement_horizontal * render.BLOCK_SIZE + 8, game_entities[0].position[1] + 6, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level)
                         #RIGHT
                         projectile.direction = True
                         game_entities.append(projectile)
                     else:
-                        projectile = Player_Projectile(game_entities[0].position[0] - render.movement_horizontal * render.BLOCK_SIZE - 8, game_entities[0].position[1] + 6, render, ray_march, get_player_location, get_block_coords, get_entity_location, level)
+                        projectile = Player_Projectile(game_entities[0].position[0] - render.movement_horizontal * render.BLOCK_SIZE - 8, game_entities[0].position[1] + 6, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level)
                         #LEFT
                         projectile.direction = False
                         game_entities.append(projectile)
