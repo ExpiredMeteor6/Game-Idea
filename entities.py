@@ -157,6 +157,9 @@ class Player(Entity):
     def is_dead(self):
         if self.position[1] >= 1000:
             self.dead = True
+        self.get_world_position()
+        if self.get_block(self.world_position) in self.render.killing_blocks:
+            self.dead = True
 
     def get_world_position(self):
         self.world_position = [self.position[0] - self.render.movement_horizontal, self.position[1] - self.render.movement_vertical]

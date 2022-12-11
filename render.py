@@ -104,6 +104,8 @@ class Render:
         self.stone_background_img = pygame.image.load('Images/stone_background.png').convert()
         self.stone_background_start_img = pygame.image.load('Images/start_stone.png').convert()
         self.dirt_background_img = pygame.image.load('Images/dirt_background.png').convert()
+        self.stone_background_stalagmite_img = pygame.image.load('Images/stone_background_stalagmite.png').convert()
+        self.stone_background_stalagtite_img = pygame.image.load('Images/stone_background_stalagtite.png').convert()
 
         self.grass_img = pygame.transform.scale(self.grass_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.air_img = pygame.transform.scale(self.air_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
@@ -116,6 +118,8 @@ class Render:
         self.stone_background_img = pygame.transform.scale(self.stone_background_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.stone_background_start_img = pygame.transform.scale(self.stone_background_start_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.dirt_background_img = pygame.transform.scale(self.dirt_background_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
+        self.stone_background_stalagmite_img = pygame.transform.scale(self.stone_background_stalagmite_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
+        self.stone_background_stalagtite_img = pygame.transform.scale(self.stone_background_stalagtite_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
 
         '''self.grass_img = ('Images/grass.png')
         self.air_img = ('Images/air.png')
@@ -136,7 +140,8 @@ class Render:
         self.font = pygame.font.SysFont(None, 12)
         self.music_volume = 1
 
-        self.traversable_blocks = [0, 5, 6, 7, 8, 9]
+        self.traversable_blocks = [0, 5, 6, 7, 8, 9, 10, 11]
+        self.killing_blocks = [10, 11]
 
     def redraw_sky_level(self):
         for chunk in self.LEVEL_MAP:
@@ -222,6 +227,12 @@ class Render:
                     
                     elif block == 9:
                         place_rotated_img(self.dirt_background_img)
+                    
+                    elif block == 10:
+                        place_img(self.stone_background_stalagmite_img)
+
+                    elif block == 11:
+                        place_img(self.stone_background_stalagtite_img)
                     
 
 
