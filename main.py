@@ -15,8 +15,10 @@ clock = pygame.time.Clock()
 FRAME_RATE = 30
 
 blob_img = pygame.transform.scale(pygame.image.load('Images/blob_right.png'), (32,32))
+blob_down_img = pygame.transform.scale(pygame.image.load('Images/blob_down_right.png'), (32,32))
 full_size_blob = pygame.transform.scale(pygame.image.load('Images/blob_right.png'), (320,320))
 crying_blob_img = pygame.transform.scale(pygame.image.load('Images/blob_crying.png'), (320,320))
+crying_blob_2_img = pygame.transform.scale(pygame.image.load('Images/blob_crying_2.png'), (320,320))
 
 pygame.display.set_caption("The Adventures of Lil' Herb")
 pygame.display.set_icon(blob_img)
@@ -80,7 +82,7 @@ def get_block_coords(position):
 
 game_entities = []
 level_music = {0 : "Audio/Time.mp3",
-                1 : "Audio/Darkness.mp3"}
+                1 : "Audio/Mist.mp3"}
 
 def check_entity_collisions():
     for entity in game_entities:
@@ -100,7 +102,6 @@ def check_entity_collisions():
                     other_entity.on_collide(entity)
 
 def within_5_px(entity1, entity2):
-    print(abs(entity1[0] - entity2[0]), abs(entity1[1] - entity2[1]))
     if abs(entity1[0] - entity2[0]) < 10 and abs(entity1[1] - entity2[1]) < 10:
         return True
     else:
@@ -259,9 +260,21 @@ def Start_Screen():
     quit_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Quit", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 300))
 
     blob = Display_Image(render, blob_img, (render.WINDOW_WIDTH/2 - 740,render.WINDOW_HEIGHT/2 - 404))
+    blob_down = Display_Image(render, blob_down_img, (render.WINDOW_WIDTH/2 - 740,render.WINDOW_HEIGHT/2 - 404))
 
+    count = 0
+    state = 0
 
     while displayed:
+        if count % 10 == 0:
+            if state == 0:
+                state = 1
+            else:
+                state = 0
+                
+        render.wipe()
+        render.screen.blit(render.BG, (0,0))
+
         start_button.change_button_colour(pygame.mouse.get_pos())
         start_button.button_update()
 
@@ -275,7 +288,11 @@ def Start_Screen():
         quit_button.button_update()
 
         game_title.paste_text()
-        blob.paste_img()
+
+        if state == 0:
+            blob.paste_img()
+        else:
+            blob_down.paste_img()
 
         for event in pygame.event.get():
             # Check for QUIT event      
@@ -296,6 +313,7 @@ def Start_Screen():
 
         
         pygame.display.update()
+        count += 1
         clock.tick(FRAME_RATE)
 
 def Level_Selection_Screen():
@@ -304,8 +322,8 @@ def Level_Selection_Screen():
 
     back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (150,100))
     
-    level_1 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 1", (render.WINDOW_WIDTH/2 - 400,render.WINDOW_HEIGHT/2 - 250))
-    level_2 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 2", (render.WINDOW_WIDTH/2 - 400,render.WINDOW_HEIGHT/2 - 150))
+    level_1 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 1: Dangerous Caverns", (render.WINDOW_WIDTH/2 - 400,render.WINDOW_HEIGHT/2 - 250))
+    level_2 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 2: To be added", (render.WINDOW_WIDTH/2 - 400,render.WINDOW_HEIGHT/2 - 150))
 
     title = Text(render, (0,0,205), "Level Selection:", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
     
@@ -333,10 +351,10 @@ def Level_Selection_Screen():
                     Start_Screen()
                     displayed = False
                 if level_1.check_clicked(pygame.mouse.get_pos()) == True:
-                    Game_Screen(0)
+                    Game_Screen(1)
                     displayed = False
                 if level_2.check_clicked(pygame.mouse.get_pos()) == True:
-                    Game_Screen(1)
+                    Game_Screen(0)
                     displayed = False
 
         
@@ -395,16 +413,36 @@ def Help_Screen():
         clock.tick(FRAME_RATE)
 
 def Level_Failed_Screen(level):
+    render.music.load('Audio/Darkness.mp3')
+    render.music.set_volume(render.music_volume)
+    render.music.play(-1)
     displayed = True
-    render.screen.blit(render.BG, (0,0))
 
+    render.screen.blit(render.BG, (0,0))    
     back_to_main_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back To Main Menu", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 300))
     retry_level = Button(render, (0,0,205), (0,0,139), (0,0,0), "Retry Level", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 150))
     
     crying_blob = Display_Image(render, crying_blob_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
+    crying_blob_2 = Display_Image(render, crying_blob_2_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
     title = Text(render, (255,0,0), "Level Failed! You Died!", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
-    
+
+    count = 0
+    state = 0
+
     while displayed:
+        render.wipe()
+        render.screen.blit(render.BG, (0,0))
+        if count % 10 == 0:
+            if state == 0:
+                state = 1
+            else:
+                state = 0
+        
+        if state == 1:
+            crying_blob.paste_img()
+        else:
+            crying_blob_2.paste_img()
+            
         back_to_main_button.change_button_colour(pygame.mouse.get_pos())
         back_to_main_button.button_update()
 
@@ -412,7 +450,6 @@ def Level_Failed_Screen(level):
         retry_level.button_update()
 
         title.paste_text()
-        crying_blob.paste_img()
 
         for event in pygame.event.get():
             # Check for QUIT event      
@@ -430,6 +467,8 @@ def Level_Failed_Screen(level):
         
         pygame.display.update()
         clock.tick(FRAME_RATE)
+        
+        count += 1
 
 def Level_Completed_Screen(level):
     displayed = True
@@ -467,7 +506,6 @@ def Level_Completed_Screen(level):
         
         pygame.display.update()
         clock.tick(FRAME_RATE)
-
 
 render.music.load('Audio/Time.mp3')
 render.music.set_volume(render.music_volume)

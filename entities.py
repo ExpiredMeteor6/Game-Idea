@@ -136,6 +136,7 @@ class Player(Entity):
         self.player_img_left = pygame.transform.scale(self.player_img_left, (self.Player_Size, self.Player_Size))
         self.player_img_down_right = pygame.transform.scale(self.player_img_down_right, (self.Player_Size, self.Player_Size))
         self.player_img_down_left = pygame.transform.scale(self.player_img_down_left, (self.Player_Size, self.Player_Size))
+        self.player_img_right_explosion = pygame.transform.scale(self.player_img_right_explosion, (self.Player_Size, self.Player_Size))
         self.player_img_left_explosion = pygame.transform.scale(self.player_img_left_explosion, (self.Player_Size, self.Player_Size))
 
         self.state = 0
