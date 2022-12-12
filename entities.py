@@ -113,7 +113,7 @@ class Player_Projectile(Entity):
     
     def on_collide(self, entity):
         if entity.entity_type == "Enemy":
-            entity.dead = True
+            entity.shot = True
 
 class Player(Entity):
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
@@ -382,11 +382,15 @@ class Enemy(Entity):
         self.enemy_img_left = pygame.image.load('Images/red_blob_left.png')
         self.enemy_img_down_right = pygame.image.load('Images/red_blob_down_right.png')
         self.enemy_img_down_left = pygame.image.load('Images/red_blob_down_left.png')
+        self.red_blob_img_right_explosion = pygame.image.load('Images/red_blob_right_explosion.png')
+        self.red_blob_img_left_explosion = pygame.image.load('Images/red_blob_left_explosion.png')
 
         self.enemy_img_right = pygame.transform.scale(self.enemy_img_right, (self.Player_Size, self.Player_Size))
         self.enemy_img_left = pygame.transform.scale(self.enemy_img_left, (self.Player_Size, self.Player_Size))
         self.enemy_img_down_right = pygame.transform.scale(self.enemy_img_down_right, (self.Player_Size, self.Player_Size))
         self.enemy_img_down_left = pygame.transform.scale(self.enemy_img_down_left, (self.Player_Size, self.Player_Size))
+        self.red_blob_img_right_explosion = pygame.transform.scale(self.red_blob_img_right_explosion, (self.Player_Size, self.Player_Size))
+        self.red_blob_img_left_explosion = pygame.transform.scale(self.red_blob_img_left_explosion, (self.Player_Size, self.Player_Size))
 
         self.state = 0
         self.moving = 0
@@ -404,6 +408,8 @@ class Enemy(Entity):
         self.level = level
         self.dead = False
         self.movement_pixels = 6
+        self.count_since_death = 0
+        self.shot = False
 
         self.entity_type = "Enemy"
         
@@ -417,13 +423,26 @@ class Enemy(Entity):
             texture = self.enemy_img_down_right
         if self.state == 3:
             texture = self.enemy_img_down_left
+        if self.state == 4:
+            texture = self.red_blob_img_right_explosion
+        if self.state == 5:
+            texture = self.red_blob_img_left_explosion
         else:
             pass
         return texture
     
     def is_dead(self):
         if self.position[1] >= 1000:
-            self.dead = True
+            if self.state == 0 or self.state == 2:
+                self.state = 4
+            else:
+                self.state = 5
+        
+        if self.shot == True:
+            if self.state == 0 or self.state == 2:
+                self.state = 4
+            else:
+                self.state = 5
     
     def convert_local_coords_to_global(self, move):
         #print(self.get_player_world_position())
@@ -474,99 +493,77 @@ class Enemy(Entity):
             entity.made_contact = True
 
     def tick(self):
-        if self.route == None:
-            self.moving = 0
+        if self.state == 4 or self.state == 5:
+            if self.count_since_death == 10:
+                self.dead = True
+            else:
+                self.count_since_death += 1
         else:
-            #print(self.route)
-            if len(self.route) > 0:
-                node = self.route[0]
-                start_end_nodes = self.convert_local_coords_to_global(True)
+            if self.route == None:
+                self.moving = 0
+            else:
+                #print(self.route)
+                if len(self.route) > 0:
+                    node = self.route[0]
+                    start_end_nodes = self.convert_local_coords_to_global(True)
 
-                if start_end_nodes[0][0] < start_end_nodes[1][0]:
-                    self.moving = 1
-                    if self.state == 1 or self.state == 3:
-                        self.state = 0
-                if start_end_nodes[0][0] > start_end_nodes[1][0]:
-                    self.moving = -1
-                    if self.state == 0 or self.state == 2:
-                        self.state = 1
-                if start_end_nodes[0][1] > start_end_nodes[1][1]:
-                    if self.count_at_activation == 0 and self.ON_GROUND == True:
-                        self.JUMPING = True
-                        self.count_at_activation = self.count
+                    if start_end_nodes[0][0] < start_end_nodes[1][0]:
+                        self.moving = 1
+                        if self.state == 1 or self.state == 3:
+                            self.state = 0
+                    if start_end_nodes[0][0] > start_end_nodes[1][0]:
+                        self.moving = -1
+                        if self.state == 0 or self.state == 2:
+                            self.state = 1
+                    if start_end_nodes[0][1] > start_end_nodes[1][1]:
+                        if self.count_at_activation == 0 and self.ON_GROUND == True:
+                            self.JUMPING = True
+                            self.count_at_activation = self.count
 
-                if node == start_end_nodes[1]:
-                    print(f"reached {node}")
-                    self.route.remove(node)
-                    self.moving = 0
+                    if node == start_end_nodes[1]:
+                        print(f"reached {node}")
+                        self.route.remove(node)
+                        self.moving = 0
+                    
                 
-            
 
 
 
-                #relic either remove or develop later
-                '''
-                else:
-                    print(node)
-                    if start_end_nodes[1] in self.route:
-                        print("test")
-                        pos_in_list = self.route.index(node)
-                        print(f"Pos_in_list = {pos_in_list}")
-                        if pos_in_list > 0:
-                            for i in range(pos_in_list):
-                                print("skipped node")
-                                self.route.remove(self.route[0])
+                    #relic either remove or develop later
+                    '''
                     else:
-                        if node[0] < start_end_nodes[1][0]:
-                            self.moving = 1
-                            if self.state == 1 or self.state == 3:
-                                self.state = 0
-                        if node[0] > start_end_nodes[1][0]:
-                            self.moving = -1
-                            if self.state == 0 or self.state == 2:
-                                self.state = 1
-                        if node[1] > start_end_nodes[1][1]:
-                            if self.count_at_activation == 0 and self.ON_GROUND == True:
-                                self.JUMPING = True
-                                self.count_at_activation = self.count
+                        print(node)
+                        if start_end_nodes[1] in self.route:
+                            print("test")
+                            pos_in_list = self.route.index(node)
+                            print(f"Pos_in_list = {pos_in_list}")
+                            if pos_in_list > 0:
+                                for i in range(pos_in_list):
+                                    print("skipped node")
+                                    self.route.remove(self.route[0])
+                        else:
+                            if node[0] < start_end_nodes[1][0]:
+                                self.moving = 1
+                                if self.state == 1 or self.state == 3:
+                                    self.state = 0
+                            if node[0] > start_end_nodes[1][0]:
+                                self.moving = -1
+                                if self.state == 0 or self.state == 2:
+                                    self.state = 1
+                            if node[1] > start_end_nodes[1][1]:
+                                if self.count_at_activation == 0 and self.ON_GROUND == True:
+                                    self.JUMPING = True
+                                    self.count_at_activation = self.count
 
-                        if node == start_end_nodes[1]:
-                            print(f"correction reached {node}")
-                            self.route.remove(node)
-                            self.moving = 0
-                            '''
-        self.is_dead()
+                            if node == start_end_nodes[1]:
+                                print(f"correction reached {node}")
+                                self.route.remove(node)
+                                self.moving = 0
+                                '''
+            self.is_dead()
 
-        self.count += 1
-        
-        pos = self.get_offset_pos()
-        pos[0] += 30
-        pos[1] += 32
-        can_move1 = self.raymarch_func(pos, (0, 1))
-
-        pos = self.get_offset_pos()
-        pos[1] += 32
-        can_move2 = self.raymarch_func(pos, (0, 1))
-  
-        if self.pathfinder == None and self.count % 20 == 0:
-            nodes = self.convert_local_coords_to_global(False)
-            #nodes = [(0, 0), (10, 10)]
-            self.pathfinder = Threader(nodes[0], nodes[1], self.level)
-            self.pathfinder.start_thread()
-
-        if self.pathfinder != None:
-            if self.pathfinder.is_done():
-                self.route = self.pathfinder.get_result()
-                self.pathfinder.destroy()
-                self.pathfinder = None
-
-
-        if can_move1 == 0 or can_move2 == 0:
-            self.ON_GROUND = True
-        else:
-            self.ON_GROUND = False
-        
-        if self.JUMPING == False:
+            self.count += 1
+            
             pos = self.get_offset_pos()
             pos[0] += 30
             pos[1] += 32
@@ -575,65 +572,93 @@ class Enemy(Entity):
             pos = self.get_offset_pos()
             pos[1] += 32
             can_move2 = self.raymarch_func(pos, (0, 1))
-            self.position[1] += min(can_move1, can_move2, self.downward_momentum)
+    
+            if self.pathfinder == None and self.count % 20 == 0:
+                nodes = self.convert_local_coords_to_global(False)
+                #nodes = [(0, 0), (10, 10)]
+                self.pathfinder = Threader(nodes[0], nodes[1], self.level)
+                self.pathfinder.start_thread()
 
-            if min(can_move1, can_move2, 10) == 0:
-                self.downward_momentum = 0
-            else:
-                if self.downward_momentum < 14:
-                    self.downward_momentum += 2
-        else:
-            pos = self.get_offset_pos()
-            pos[0] += 30
-            pos[1] += 10
-            can_move1 = self.raymarch_func(pos, (0, -1))
+            if self.pathfinder != None:
+                if self.pathfinder.is_done():
+                    self.route = self.pathfinder.get_result()
+                    self.pathfinder.destroy()
+                    self.pathfinder = None
 
-            pos = self.get_offset_pos()
-            pos[1] += 10
-            can_move2 = self.raymarch_func(pos, (0, -1))
-
-            self.position[1] -= min(can_move1, can_move2, 12 - self.jump_decay)
 
             if can_move1 == 0 or can_move2 == 0:
-                self.jump_decay = 12
-            
-            if self.jump_decay == 12:
-                self.JUMPING = False
-                self.count_at_activation = 0
-                self.jump_decay = 0
+                self.ON_GROUND = True
             else:
-                self.jump_decay += 1
+                self.ON_GROUND = False
+            
+            if self.JUMPING == False:
+                pos = self.get_offset_pos()
+                pos[0] += 30
+                pos[1] += 32
+                can_move1 = self.raymarch_func(pos, (0, 1))
 
-        if self.moving == 1:
-            pos = self.get_offset_pos()
-            pos[0] += 32
-            can_move1 = self.raymarch_func(pos, (1, 0))
+                pos = self.get_offset_pos()
+                pos[1] += 32
+                can_move2 = self.raymarch_func(pos, (0, 1))
+                self.position[1] += min(can_move1, can_move2, self.downward_momentum)
 
-            pos = self.get_offset_pos()
-            pos[0] += 32
-            pos[1] += 31
-            can_move2 = self.raymarch_func(pos, (1, 0))
-            if min(can_move1, can_move2) >= self.movement_pixels:
-                self.position[0] += self.movement_pixels
+                if min(can_move1, can_move2, 10) == 0:
+                    self.downward_momentum = 0
+                else:
+                    if self.downward_momentum < 14:
+                        self.downward_momentum += 2
+            else:
+                pos = self.get_offset_pos()
+                pos[0] += 30
+                pos[1] += 10
+                can_move1 = self.raymarch_func(pos, (0, -1))
 
-        if self.moving == -1:
-            pos = self.get_offset_pos()
-            can_move1 = self.raymarch_func(pos, (-1, 0))
+                pos = self.get_offset_pos()
+                pos[1] += 10
+                can_move2 = self.raymarch_func(pos, (0, -1))
 
-            pos = self.get_offset_pos()
-            pos[1] += 31
-            can_move2 = self.raymarch_func(pos, (-1, 0))
-            if min(can_move1, can_move2) >= self.movement_pixels:
-                self.position[0] -= self.movement_pixels
-        
-        if self.moving != 0 and self.count % 20 == 0:
-            self.bounce()
-        
-        if self.moving == 0:
-            if self.state == 2:
-                self.state = 0
-            elif self.state == 3:
-                self.state = 1
+                self.position[1] -= min(can_move1, can_move2, 12 - self.jump_decay)
+
+                if can_move1 == 0 or can_move2 == 0:
+                    self.jump_decay = 12
+                
+                if self.jump_decay == 12:
+                    self.JUMPING = False
+                    self.count_at_activation = 0
+                    self.jump_decay = 0
+                else:
+                    self.jump_decay += 1
+
+            if self.moving == 1:
+                pos = self.get_offset_pos()
+                pos[0] += 32
+                can_move1 = self.raymarch_func(pos, (1, 0))
+
+                pos = self.get_offset_pos()
+                pos[0] += 32
+                pos[1] += 31
+                can_move2 = self.raymarch_func(pos, (1, 0))
+                if min(can_move1, can_move2) >= self.movement_pixels:
+                    self.position[0] += self.movement_pixels
+
+            if self.moving == -1:
+                pos = self.get_offset_pos()
+                can_move1 = self.raymarch_func(pos, (-1, 0))
+
+                pos = self.get_offset_pos()
+                pos[1] += 31
+                can_move2 = self.raymarch_func(pos, (-1, 0))
+                if min(can_move1, can_move2) >= self.movement_pixels:
+                    self.position[0] -= self.movement_pixels
+            
+            if self.moving != 0 and self.count % 20 == 0:
+                self.bounce()
+            
+            if self.moving == 0:
+                if self.state == 2:
+                    self.state = 0
+                elif self.state == 3:
+                    self.state = 1
     
     def bounce(self):
         if self.state == 0:
