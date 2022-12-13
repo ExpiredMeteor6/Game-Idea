@@ -4,6 +4,7 @@ import copy
 import time
 from pathfinding import PathFinder, Node, ConnectionAssessor
 from thread_handler import Threader
+import math
 
 class Entity:
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
@@ -239,10 +240,13 @@ class Player(Entity):
     
     def on_collide(self, entity):
         if entity.entity_type == "Enemy":
-            if self.state == 0 or self.state == 2:
-                self.state = 4
-            elif self.state == 1 or self.state == 3:
-                self.state = 5
+            if entity.state == 4 or entity.state == 5:
+                pass
+            else:
+                if self.state == 0 or self.state == 2:
+                    self.state = 4
+                elif self.state == 1 or self.state == 3:
+                    self.state = 5
     
     def tick(self):
         self.count += 1
@@ -575,9 +579,10 @@ class Enemy(Entity):
     
             if self.pathfinder == None and self.count % 20 == 0:
                 nodes = self.convert_local_coords_to_global(False)
-                #nodes = [(0, 0), (10, 10)]
-                self.pathfinder = Threader(nodes[0], nodes[1], self.level)
-                self.pathfinder.start_thread()
+                if math.sqrt((nodes[0][0] - nodes[1][0])**2 + (nodes[0][1] - nodes[1][1])**2) < 8:
+                    print(math.sqrt((nodes[0][0] - nodes[1][0])**2 + (nodes[0][1] - nodes[1][1])**2))
+                    self.pathfinder = Threader(nodes[0], nodes[1], self.level)
+                    self.pathfinder.start_thread()
 
             if self.pathfinder != None:
                 if self.pathfinder.is_done():
