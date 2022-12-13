@@ -143,18 +143,6 @@ class Render:
         self.traversable_blocks = [0, 5, 6, 7, 8, 9, 10, 11]
         self.killing_blocks = [10, 11]
 
-    def redraw_sky_level(self):
-        for chunk in self.LEVEL_MAP:
-            y=0
-            for row in chunk.CHUNK:
-                x=0
-                for block in row:
-                    if block == 0:
-                        self.screen.blit(self.air_img, ((x + chunk.CHUNK_SIZE * chunk.x_y[0]) * self.BLOCK_SIZE, (y + chunk.CHUNK_SIZE * chunk.x_y[1]) * self.BLOCK_SIZE))
-                    else:
-                        pass
-                    x +=1
-                y += 1
 
     def place_rotated_block(self, block, y, x):
         random_num = Chunk().block_rotation(y, x)
@@ -312,52 +300,13 @@ class Render:
 
     def draw_level(self):
         for chunk in self.LEVEL_MAP:
-            x = chunk.x_y[0]
-            y = chunk.x_y[1]
-
-            self.draw_chunk(x, y)
-
-        '''
-        for chunk in self.LEVEL_MAP:
-            y = 0
-            for row in chunk.CHUNK:
-                x = 0
-                for block in row:
-                    placex = (x + self.movement_horizontal + chunk.CHUNK_SIZE * chunk.x_y[0]) * self.BLOCK_SIZE
-                    placey = (y + self.movement_vertical + chunk.CHUNK_SIZE * chunk.x_y[1]) * self.BLOCK_SIZE
-
-                    place_img = lambda i : self.screen.blit(i, (placex, placey))
-                    place_rotated_img = lambda i : place_img(self.place_rotated_block(i, y, x))
-
-                    if block == 0:
-                        place_img(self.air_img)
-
-                    elif block == 1:
-                        place_img(self.grass_img)
-
-                    elif block == 2:
-                        place_rotated_img(self.dirt_img)
-                    
-                    elif block == 3:
-                        place_rotated_img(self.stone_img)
-                    
-                    elif block == 4:
-                        place_rotated_img(self.iron_ore_img)
-                    
-                    elif block == 5:
-                        place_img(self.start_img)
-                        self.start_coords = (x, y)
-                    
-                    elif block == 6:
-                        place_img(self.testing_img)
-                    
-                    if self.SHOW_CHUNK_COORDS == True:
-                        img = self.font.render(f"{x + chunk.CHUNK_SIZE * chunk.x_y[0]}, {y + chunk.CHUNK_SIZE * chunk.x_y[1]}", True, (0, 0, 0))
-                        place_img(img)
-
-                    x += 1
-                y += 1
-                '''
+            if chunk.x_y[0] + 1 <= abs(self.movement_horizontal / 8) or chunk.x_y[0] >= abs(self.movement_horizontal / 8) + 9:
+                pass
+                
+            else:
+                x = chunk.x_y[0]
+                y = chunk.x_y[1]
+                self.draw_chunk(x, y)
 
     def wipe(self):
         self.screen.fill((0,0,0))

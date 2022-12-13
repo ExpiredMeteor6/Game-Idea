@@ -580,7 +580,6 @@ class Enemy(Entity):
             if self.pathfinder == None and self.count % 20 == 0:
                 nodes = self.convert_local_coords_to_global(False)
                 if math.sqrt((nodes[0][0] - nodes[1][0])**2 + (nodes[0][1] - nodes[1][1])**2) < 8:
-                    print(math.sqrt((nodes[0][0] - nodes[1][0])**2 + (nodes[0][1] - nodes[1][1])**2))
                     self.pathfinder = Threader(nodes[0], nodes[1], self.level)
                     self.pathfinder.start_thread()
 
