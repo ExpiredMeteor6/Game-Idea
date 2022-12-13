@@ -339,8 +339,8 @@ def Level_Selection_Screen():
 
     back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (150,100))
     
-    level_1 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 1: Dangerous Caverns", (render.WINDOW_WIDTH/2 - 400,render.WINDOW_HEIGHT/2 - 250))
-    level_2 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 2: To be added", (render.WINDOW_WIDTH/2 - 400,render.WINDOW_HEIGHT/2 - 150))
+    level_1 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 1: Dangerous Caverns", (700, 250))
+    level_2 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 2: To be added", (585, 325))
 
     title = Text(render, (0,0,205), "Level Selection:", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
     

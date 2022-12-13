@@ -140,7 +140,7 @@ class Render:
         self.font = pygame.font.SysFont(None, 12)
         self.music_volume = 1
 
-        self.traversable_blocks = [0, 5, 6, 7, 8, 9, 10, 11]
+        self.traversable_blocks = [0, 5, 6, 7, 8, 9, 10, 11, 12]
         self.killing_blocks = [10, 11]
 
 
