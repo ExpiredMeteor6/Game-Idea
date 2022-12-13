@@ -186,7 +186,7 @@ class Render:
                     place_img = lambda i : new_image.paste(self.convert_pygame_image_to_pil(i),(placex,placey))
                     place_rotated_img = lambda i : place_img(self.place_rotated_block(i, y, x))
 
-                    if block == 0:
+                    if block == 0 or block == 12:
                         place_img(self.air_img)
 
                     elif block == 1:
@@ -264,6 +264,41 @@ class Render:
                 row_within_chunk += 1
             chunk_num += 1
     
+    def find_enemy_spawn_points(self):
+        enemy_spawn_coords = []
+        chunk_num = 0
+        for chunk in self.LEVEL_MAP:
+            row_within_chunk = 0
+            for row in chunk.CHUNK:
+                block_within_row = 0
+                for block in row:
+                    
+                    if block == 12:
+                        chunk_row_block = [chunk_num, row_within_chunk, block_within_row]
+                        enemy_spawn = [0, 0]
+
+                        chunk_coords = [0, 0]
+                        chunk_coords[0] += chunk_row_block[0] // 4
+                        chunk_coords[1] += chunk_row_block[0] % 4
+
+                        block_coords = [0, 0]
+                        block_coords[0] += block_within_row
+                        block_coords[1] += row_within_chunk
+
+                        enemy_spawn[1] = chunk_coords[1] * 8 + block_coords[1]
+                        enemy_spawn[0] = chunk_coords[0] * 8 + block_coords[0]
+
+                        enemy_spawn_coords.append(enemy_spawn)
+                    
+                    else:
+                        pass
+
+                    block_within_row += 1
+                row_within_chunk += 1
+            chunk_num += 1
+        
+        return enemy_spawn_coords
+
     def find_finish(self):
         chunk_num = 0
         for chunk in self.LEVEL_MAP:

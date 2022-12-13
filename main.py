@@ -97,24 +97,36 @@ def check_entity_collisions():
                 else:
                     other_pos = [other_entity.position[0],  other_entity.position[1]]
 
-                if within_5_px(pos, other_pos):
+                if within_10_px(pos, other_pos):
                     entity.on_collide(other_entity)
                     other_entity.on_collide(entity)
 
-def within_5_px(entity1, entity2):
+def within_10_px(entity1, entity2):
     if abs(entity1[0] - entity2[0]) < 10 and abs(entity1[1] - entity2[1]) < 10:
         return True
     else:
         False
-        
+
+def update_enemy_list_positions():
+    for entity in game_entities:
+        if entity.entity_type == "Enemy":
+            game_entities[game_entities.index(entity)].entity_num = game_entities.index(entity)
+
 def Game_Screen(level):
     render.convert_map_list_to_level(render.file.load(level))
     render.find_start()
     render.find_finish()
+    enemy_spawn_coords = render.find_enemy_spawn_points()
+    print(enemy_spawn_coords)
     running = True
 
     game_entities.append(Player(1024, render.start_coords[1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level))
-    game_entities.append(Enemy(984, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level))
+    for i in range(len(enemy_spawn_coords)):
+        enemy = Enemy(enemy_spawn_coords[i][0] * render.BLOCK_SIZE, enemy_spawn_coords[i][1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level)
+        game_entities.append(enemy)
+        game_entities[game_entities.index(enemy)].entity_num = game_entities.index(enemy)
+
+        
 
     render.music.load(level_music[level])
     render.music.play(-1)
@@ -153,8 +165,13 @@ def Game_Screen(level):
             else:
                 '''print((entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))'''
                 if entity.dead == True:
-                    game_entities.remove(entity)
-                    print("Entity removed")
+                    if entity.entity_type == "Enemy":
+                        game_entities.remove(entity)
+                        print("Enemy removed")
+                        update_enemy_list_positions()
+                    else:
+                        game_entities.remove(entity)
+                        print("Entity removed")
                 else:
                     render.screen.blit(texture, (entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))
             

@@ -416,6 +416,7 @@ class Enemy(Entity):
         self.shot = False
 
         self.entity_type = "Enemy"
+        self.entity_num = 0
         
     
     def get_texture(self):
@@ -452,7 +453,7 @@ class Enemy(Entity):
         #print(self.get_player_world_position())
         move = True
         if move == True:
-            start_node = self.get_block_coords((self.get_entity_location(1)[0] + int(self.render.movement_horizontal) * self.render.BLOCK_SIZE + 16, self.get_entity_location(1)[1] + int(self.render.movement_vertical) * self.render.BLOCK_SIZE))
+            start_node = self.get_block_coords((self.get_entity_location(self.entity_num)[0] + int(self.render.movement_horizontal) * self.render.BLOCK_SIZE + 16, self.get_entity_location(self.entity_num)[1] + int(self.render.movement_vertical) * self.render.BLOCK_SIZE))
             end_node = self.get_block_coords((self.get_player_world_position()[0] + int(self.render.movement_horizontal) + 16, self.get_player_world_position()[1] + int(self.render.movement_vertical)))
 
             start_pos = (start_node[0][0]*8 + start_node[1][0], start_node[0][1]*8 + start_node[1][1])
@@ -495,6 +496,7 @@ class Enemy(Entity):
     def on_collide(self, entity):
         if entity.entity_type == "Projectile":
             entity.made_contact = True
+            self.shot = True
 
     def tick(self):
         if self.state == 4 or self.state == 5:
@@ -564,10 +566,9 @@ class Enemy(Entity):
                                 self.route.remove(node)
                                 self.moving = 0
                                 '''
+            self.count += 1
             self.is_dead()
 
-            self.count += 1
-            
             pos = self.get_offset_pos()
             pos[0] += 30
             pos[1] += 32
