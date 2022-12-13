@@ -183,7 +183,7 @@ class Player(Entity):
         if self.get_block([self.world_position[0] + self.render.movement_horizontal, self.world_position[1]]) in self.render.killing_blocks:
             if self.state == 0 or self.state == 2:
                 self.state = 4
-            else:
+            elif self.state == 1 or self.state == 3:
                 self.state = 5
             
 
@@ -241,7 +241,7 @@ class Player(Entity):
         if entity.entity_type == "Enemy":
             if self.state == 0 or self.state == 2:
                 self.state = 4
-            else:
+            elif self.state == 1 or self.state == 3:
                 self.state = 5
     
     def tick(self):
@@ -256,29 +256,7 @@ class Player(Entity):
             else:
                 self.count_since_death += 1
 
-        
-        pos = copy.copy(self.position)
-        pos[0] += 30
-        pos[1] += 32
-        can_move1 = self.raymarch_func(pos, (0, 1))
-
-        pos = copy.copy(self.position)
-        pos[1] += 32
-        can_move2 = self.raymarch_func(pos, (0, 1))
-
-        if self.shoot == True:
-            if self.time_till_next_shot == 0:
-                self.shoot = False
-                self.time_till_next_shot = 15
-            else:
-                self.time_till_next_shot -= 1
-
-        if can_move1 == 0 or can_move2 == 0:
-            self.ON_GROUND = True
         else:
-            self.ON_GROUND = False
-        
-        if self.JUMPING == False:
             pos = copy.copy(self.position)
             pos[0] += 30
             pos[1] += 32
@@ -288,73 +266,95 @@ class Player(Entity):
             pos[1] += 32
             can_move2 = self.raymarch_func(pos, (0, 1))
 
-            self.position[1] += min(can_move1, can_move2, self.downward_momentum)
-
-            if min(can_move1, can_move2, 10) == 0:
-                self.downward_momentum = 0
-            else:
-                if self.downward_momentum < 14:
-                    self.downward_momentum += 2
-        else:
-            pos = copy.copy(self.position)
-            pos[0] += 30
-            pos[1] += 10
-            can_move1 = self.raymarch_func(pos, (0, -1))
-
-            pos = copy.copy(self.position)
-            pos[1] += 10
-            can_move2 = self.raymarch_func(pos, (0, -1))
-
-            self.position[1] -= min(can_move1, can_move2, 12 - self.jump_decay)
+            if self.shoot == True:
+                if self.time_till_next_shot == 0:
+                    self.shoot = False
+                    self.time_till_next_shot = 15
+                else:
+                    self.time_till_next_shot -= 1
 
             if can_move1 == 0 or can_move2 == 0:
-                self.jump_decay = 12
-            
-            if self.jump_decay == 12:
-                self.JUMPING = False
-                self.count_at_activation = 0
-                self.jump_decay = 0
+                self.ON_GROUND = True
             else:
-                self.jump_decay += 1
+                self.ON_GROUND = False
+            
+            if self.JUMPING == False:
+                pos = copy.copy(self.position)
+                pos[0] += 30
+                pos[1] += 32
+                can_move1 = self.raymarch_func(pos, (0, 1))
+
+                pos = copy.copy(self.position)
+                pos[1] += 32
+                can_move2 = self.raymarch_func(pos, (0, 1))
+
+                self.position[1] += min(can_move1, can_move2, self.downward_momentum)
+
+                if min(can_move1, can_move2, 10) == 0:
+                    self.downward_momentum = 0
+                else:
+                    if self.downward_momentum < 14:
+                        self.downward_momentum += 2
+            else:
+                pos = copy.copy(self.position)
+                pos[0] += 30
+                pos[1] += 10
+                can_move1 = self.raymarch_func(pos, (0, -1))
+
+                pos = copy.copy(self.position)
+                pos[1] += 10
+                can_move2 = self.raymarch_func(pos, (0, -1))
+
+                self.position[1] -= min(can_move1, can_move2, 12 - self.jump_decay)
+
+                if can_move1 == 0 or can_move2 == 0:
+                    self.jump_decay = 12
+                
+                if self.jump_decay == 12:
+                    self.JUMPING = False
+                    self.count_at_activation = 0
+                    self.jump_decay = 0
+                else:
+                    self.jump_decay += 1
 
 
-        if self.moving == 1:
-            pos = copy.copy(self.position)
-            pos[0] += 32
-            #11 because blob is 22 pixels tall, tiles are 32, so 10 + 1
-            pos[1] += 11
-            can_move1 = self.raymarch_func(pos, (1, 0))
+            if self.moving == 1:
+                pos = copy.copy(self.position)
+                pos[0] += 32
+                #11 because blob is 22 pixels tall, tiles are 32, so 10 + 1
+                pos[1] += 11
+                can_move1 = self.raymarch_func(pos, (1, 0))
 
-            pos = copy.copy(self.position)
-            pos[0] += 32
-            pos[1] += 31
-            can_move2 = self.raymarch_func(pos, (1, 0))
-            if min(can_move1, can_move2) >= 8:
-                self.render.movement_horizontal -= self.moving / 4
+                pos = copy.copy(self.position)
+                pos[0] += 32
+                pos[1] += 31
+                can_move2 = self.raymarch_func(pos, (1, 0))
+                if min(can_move1, can_move2) >= 8:
+                    self.render.movement_horizontal -= self.moving / 4
 
-        if self.moving == -1:
-            pos = copy.copy(self.position)
-            #11 because blob is 22 pixels tall, tiles are 32, so 10 + 1
-            pos[1] += 11
-            can_move1 = self.raymarch_func(pos, (-1, 0))
+            if self.moving == -1:
+                pos = copy.copy(self.position)
+                #11 because blob is 22 pixels tall, tiles are 32, so 10 + 1
+                pos[1] += 11
+                can_move1 = self.raymarch_func(pos, (-1, 0))
 
-            pos = copy.copy(self.position)
-            pos[1] += 31
-            can_move2 = self.raymarch_func(pos, (-1, 0))
-            if min(can_move1, can_move2) >= 8:
-                self.render.movement_horizontal -= self.moving / 4
+                pos = copy.copy(self.position)
+                pos[1] += 31
+                can_move2 = self.raymarch_func(pos, (-1, 0))
+                if min(can_move1, can_move2) >= 8:
+                    self.render.movement_horizontal -= self.moving / 4
 
-        if self.moving != 0 and self.count % 10 == 0:
-            self.bounce()
+            if self.moving != 0 and self.count % 10 == 0:
+                self.bounce()
+            
+            if self.moving == 0:
+                if self.state == 2:
+                    self.state = 0
+                elif self.state == 3:
+                    self.state = 1
         
-        if self.moving == 0:
-            if self.state == 2:
-                self.state = 0
-            elif self.state == 3:
-                self.state = 1
-    
     def idle(self):
-        pass
+         pass
 
     def bounce(self):
         if self.state == 0:
@@ -366,7 +366,7 @@ class Player(Entity):
             self.state = 3
         elif self.state == 3:
             self.state = 1
-        
+            
 
 class Cloud(Entity):
     def __init__():
@@ -435,13 +435,13 @@ class Enemy(Entity):
         if self.position[1] >= 1000:
             if self.state == 0 or self.state == 2:
                 self.state = 4
-            else:
+            elif self.state == 1 or self.state == 3:
                 self.state = 5
         
         if self.shot == True:
             if self.state == 0 or self.state == 2:
                 self.state = 4
-            else:
+            elif self.state == 1 or self.state == 3:
                 self.state = 5
     
     def convert_local_coords_to_global(self, move):
