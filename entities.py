@@ -123,7 +123,6 @@ class Player(Entity):
         self.Player_Size = 32
 
         self.moving = 0
-        self.speed = 4
 
         self.player_img_right = pygame.image.load('Images/blob_right.png')
         self.player_img_left = pygame.image.load('Images/blob_left.png')
@@ -356,9 +355,6 @@ class Player(Entity):
                     self.state = 0
                 elif self.state == 3:
                     self.state = 1
-        
-    def idle(self):
-         pass
 
     def bounce(self):
         if self.state == 0:
@@ -398,7 +394,6 @@ class Enemy(Entity):
 
         self.state = 0
         self.moving = 0
-        self.speed = 4
         self.count = 0
         self.JUMPING = False
         self.count_at_activation = 0
