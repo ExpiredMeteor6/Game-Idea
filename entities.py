@@ -503,27 +503,30 @@ class Enemy(Entity):
             if self.route == None:
                 self.moving = 0
             else:
-                #print(self.route)
                 if len(self.route) > 0:
                     node = self.route[0]
                     start_end_nodes = self.convert_local_coords_to_global(True)
 
                     if start_end_nodes[0][0] < start_end_nodes[1][0]:
                         self.moving = 1
+                        #MOVE RIGHT
                         if self.state == 1 or self.state == 3:
                             self.state = 0
                     if start_end_nodes[0][0] > start_end_nodes[1][0]:
                         self.moving = -1
+                        #MOVE LEFT
                         if self.state == 0 or self.state == 2:
                             self.state = 1
                     if start_end_nodes[0][1] > start_end_nodes[1][1]:
                         if self.count_at_activation == 0 and self.ON_GROUND == True:
                             self.JUMPING = True
                             self.count_at_activation = self.count
+                            #JUMP
 
                     if node == start_end_nodes[1]:
-                        print(f"reached {node}")
+                        #WHEN ENEMY REACHES NODE, REMOVE FROM LIST
                         self.route.remove(node)
+                        #STOP MOVING
                         self.moving = 0
                     
                 
