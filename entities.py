@@ -406,7 +406,7 @@ class Enemy(Entity):
         self.pathfinder = None
         self.level = level
         self.dead = False
-        self.movement_pixels = 6
+        self.movement_pixels = 8
         self.count_since_death = 0
         self.shot = False
 
@@ -601,6 +601,7 @@ class Enemy(Entity):
                 can_move1 = self.raymarch_func(pos, (0, 1))
 
                 pos = self.get_offset_pos()
+                pos[0] += 2
                 pos[1] += 32
                 can_move2 = self.raymarch_func(pos, (0, 1))
                 self.position[1] += min(can_move1, can_move2, self.downward_momentum)
@@ -617,6 +618,7 @@ class Enemy(Entity):
                 can_move1 = self.raymarch_func(pos, (0, -1))
 
                 pos = self.get_offset_pos()
+                pos[0] += 2
                 pos[1] += 10
                 can_move2 = self.raymarch_func(pos, (0, -1))
 
@@ -641,8 +643,8 @@ class Enemy(Entity):
                 pos[0] += 32
                 pos[1] += 31
                 can_move2 = self.raymarch_func(pos, (1, 0))
-                if min(can_move1, can_move2) >= self.movement_pixels:
-                    self.position[0] += self.movement_pixels
+                
+                self.position[0] += min(can_move1, can_move2, self.movement_pixels)
 
             if self.moving == -1:
                 pos = self.get_offset_pos()
@@ -651,8 +653,7 @@ class Enemy(Entity):
                 pos = self.get_offset_pos()
                 pos[1] += 31
                 can_move2 = self.raymarch_func(pos, (-1, 0))
-                if min(can_move1, can_move2) >= self.movement_pixels:
-                    self.position[0] -= self.movement_pixels
+                self.position[0] -= min(can_move1, can_move2, self.movement_pixels)
             
             if self.moving != 0 and self.count % 20 == 0:
                 self.bounce()

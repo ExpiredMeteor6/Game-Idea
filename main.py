@@ -102,10 +102,7 @@ def check_entity_collisions():
                     other_entity.on_collide(entity)
 
 def within_10_px(entity1, entity2):
-    if abs(entity1[0] - entity2[0]) < 10 and abs(entity1[1] - entity2[1]) < 10:
-        return True
-    else:
-        False
+    return abs(entity1[0] - entity2[0]) < 10 and abs(entity1[1] - entity2[1]) < 10
 
 def update_enemy_list_positions():
     for entity in game_entities:
