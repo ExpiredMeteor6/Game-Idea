@@ -18,8 +18,7 @@ class Entity:
         self.traversable_blocks = self.render.traversable_blocks
         self.get_block = get_block
         self.dead = False
-        
-    
+
     def on_key_press(self, key):
         pass
 
@@ -406,7 +405,7 @@ class Enemy(Entity):
         self.pathfinder = None
         self.level = level
         self.dead = False
-        self.movement_pixels = 8
+        self.movement_pixels = 6
         self.count_since_death = 0
         self.shot = False
 
