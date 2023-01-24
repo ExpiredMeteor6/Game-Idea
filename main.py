@@ -163,8 +163,14 @@ def Game_Screen(level):
                 '''print((entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))'''
                 if entity.dead == True:
                     if entity.entity_type == "Enemy":
+                        
                         game_entities.remove(entity)
+                        
+                        
                         print("Enemy removed")
+                        for entity in game_entities:
+                            if entity.entity_type == "Enemy" and entity.shot == False:
+                                render.screen.blit(texture, (entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))
                         update_enemy_list_positions()
                     else:
                         game_entities.remove(entity)
@@ -231,7 +237,7 @@ def Options_Screen():
 
         back_button.change_button_colour(pygame.mouse.get_pos())
         back_button.button_update()
-
+    
         title.paste_text()
         volume.paste_text()
 
