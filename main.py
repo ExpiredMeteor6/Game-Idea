@@ -165,13 +165,12 @@ def Game_Screen(level):
                     if entity.entity_type == "Enemy":
                         
                         game_entities.remove(entity)
-                        
+                        update_enemy_list_positions()
                         
                         print("Enemy removed")
                         for entity in game_entities:
                             if entity.entity_type == "Enemy" and entity.shot == False:
-                                render.screen.blit(texture, (entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))
-                        update_enemy_list_positions()
+                                render.screen.blit(entity.get_texture(), (entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))
                     else:
                         game_entities.remove(entity)
                         print("Entity removed")
