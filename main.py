@@ -139,8 +139,7 @@ def Game_Screen(level):
             
         count += 1
         check_entity_collisions()
-        #RESET sky every frame
-        #render.redraw_sky()
+
         render.wipe()
         render.draw_level()
         for entity in game_entities:
@@ -370,10 +369,10 @@ def Level_Selection_Screen():
                     Start_Screen()
                     displayed = False
                 if level_1.check_clicked(pygame.mouse.get_pos()) == True:
-                    Game_Screen(1)
+                    Game_Screen(0)
                     displayed = False
                 if level_2.check_clicked(pygame.mouse.get_pos()) == True:
-                    Game_Screen(0)
+                    Game_Screen(1)
                     displayed = False
 
         

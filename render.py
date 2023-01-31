@@ -1,7 +1,7 @@
 import pygame
 from terrain_handler import Chunk
 from file_handler import File_Handler
-import math
+import random
 from PIL import Image
 
 class Render:
@@ -106,6 +106,8 @@ class Render:
         self.dirt_background_img = pygame.image.load('Images/dirt_background.png').convert()
         self.stone_background_stalagmite_img = pygame.image.load('Images/stone_background_stalagmite.png').convert()
         self.stone_background_stalagtite_img = pygame.image.load('Images/stone_background_stalagtite.png').convert()
+        self.lava_dark_img = pygame.image.load('Images/lava_dark.png').convert()
+        self.lava_light_img = pygame.image.load('Images/lava_light.png').convert()
 
         self.grass_img = pygame.transform.scale(self.grass_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.air_img = pygame.transform.scale(self.air_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
@@ -120,6 +122,8 @@ class Render:
         self.dirt_background_img = pygame.transform.scale(self.dirt_background_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.stone_background_stalagmite_img = pygame.transform.scale(self.stone_background_stalagmite_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.stone_background_stalagtite_img = pygame.transform.scale(self.stone_background_stalagtite_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
+        self.lava_dark_img = pygame.transform.scale(self.lava_dark_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
+        self.lava_light_img = pygame.transform.scale(self.lava_light_img, (self.BLOCK_SIZE, self.BLOCK_SIZE))
 
         '''self.grass_img = ('Images/grass.png')
         self.air_img = ('Images/air.png')
@@ -140,8 +144,8 @@ class Render:
         self.font = pygame.font.SysFont(None, 12)
         self.music_volume = 1
 
-        self.traversable_blocks = [0, 5, 6, 7, 8, 9, 10, 11, 12]
-        self.killing_blocks = [10, 11]
+        self.traversable_blocks = [0, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+        self.killing_blocks = [10, 11, 13]
 
 
     def place_rotated_block(self, block, y, x):
@@ -222,6 +226,15 @@ class Render:
                     elif block == 11:
                         place_img(self.stone_background_stalagtite_img)
                     
+                    elif block == 13:
+                        randomnum = random.randint(1,2)
+                        if randomnum == 1:
+                            place_rotated_img(self.lava_dark_img)
+                        else:
+                            place_rotated_img(self.lava_light_img)
+                    
+                    elif block == 14:
+                        place_rotated_img(self.stone_img)
 
 
                 y += 1
