@@ -114,6 +114,84 @@ class Player_Projectile(Entity):
     def on_collide(self, entity):
         if entity.entity_type == "Enemy":
             entity.shot = True
+    
+class Lava_Drop_Projectile(Entity):
+    def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
+        super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level)
+
+        self.Player_Size = 32
+
+        self.lava_drop_projectile = pygame.image.load('Images/lava_drop_projectile.png')
+        self.lava_drop_projectile = pygame.transform.scale(self.lava_drop_projectile, (self.Player_Size, self.Player_Size))
+        self.lava_drop_projectile_splat = pygame.image.load('Images/lava_drop_projectile_splat.png')
+        self.lava_drop_projectile_splat = pygame.transform.scale(self.lava_drop_projectile_splat, (self.Player_Size, self.Player_Size))
+
+        self.dead = False
+        self.made_contact = False
+        self.direction = False
+
+        self.count = 0
+        self.gravity = 0
+        self.state = 0
+        self.count_since_contact = 0
+
+        self.entity_type = "Lava Drop"
+    
+    def get_texture(self):
+        if self.state == 0:
+            return self.lava_drop_projectile
+        else:
+            return self.lava_drop_projectile_splat
+    
+    def made_contact_with_block(self):
+        if self.direction == True:
+            block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE + 24, self.position[1] + 8])
+            if block in self.traversable_blocks:
+                pass
+            else:
+                self.made_contact = True
+            
+            block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE + 24, self.position[1] + 24])
+            if block in self.traversable_blocks:
+                pass
+            else:
+                self.made_contact = True
+            
+        else:
+            block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE, self.position[1] + 8])
+            if block in self.traversable_blocks:
+                pass
+            else:
+                self.made_contact = True
+            
+            block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE, self.position[1] + 24])
+            if block in self.traversable_blocks:
+                pass
+            else:
+                self.made_contact = True
+
+    def move(self):
+        self.position[1] += self.gravity
+    
+    def tick(self):
+        self.count += 1
+        if self.count % 2 == 0:
+            self.gravity += 0.5
+
+        self.made_contact_with_block()
+        if self.made_contact == True:
+            self.state = 1
+            if self.count_since_contact == 4:
+                self.dead = True
+            else:
+                self.count_since_contact += 1
+        else:
+            self.move()
+    
+    def on_collide(self, entity):
+        if entity.entity_type == "Player":
+            entity.dead = True
+
 
 class Player(Entity):
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):

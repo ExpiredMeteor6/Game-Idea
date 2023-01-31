@@ -343,6 +343,42 @@ class Render:
                     block_within_row += 1
                 row_within_chunk += 1
             chunk_num += 1
+    
+    def find_lava_drop_spawners(self):
+        lava_drop_spawners = []
+        chunk_num = 0
+        for chunk in self.LEVEL_MAP:
+            row_within_chunk = 0
+            for row in chunk.CHUNK:
+                block_within_row = 0
+                for block in row:
+                    
+                    if block == 14:
+                        chunk_row_block = [chunk_num, row_within_chunk, block_within_row]
+                        lava_drop_spawn = [0, 0]
+
+                        chunk_coords = [0, 0]
+                        chunk_coords[0] += chunk_row_block[0] // 4
+                        chunk_coords[1] += chunk_row_block[0] % 4
+
+                        block_coords = [0, 0]
+                        block_coords[0] += block_within_row
+                        block_coords[1] += row_within_chunk
+
+                        #Plus one to make entity spawn block below
+                        lava_drop_spawn[1] = chunk_coords[1] * 8 + block_coords[1] + 1
+                        lava_drop_spawn[0] = chunk_coords[0] * 8 + block_coords[0] 
+
+                        lava_drop_spawners.append(lava_drop_spawn)
+                    
+                    else:
+                        pass
+
+                    block_within_row += 1
+                row_within_chunk += 1
+            chunk_num += 1
+        
+        return lava_drop_spawners
 
             
 

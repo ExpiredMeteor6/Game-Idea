@@ -6,7 +6,7 @@ import sys
 from render import Render
 import time
 import math
-from entities import Entity, Player, Enemy, Player_Projectile
+from entities import Entity, Player, Enemy, Player_Projectile, Lava_Drop_Projectile
 from ui import Button, Image_Button, Text, Display_Image
 from pathfinding import PathFinder
 
@@ -114,7 +114,8 @@ def Game_Screen(level):
     render.find_start()
     render.find_finish()
     enemy_spawn_coords = render.find_enemy_spawn_points()
-    print(enemy_spawn_coords)
+    lava_drop_block_coords = render.find_lava_drop_spawners()
+    print(lava_drop_block_coords)
     running = True
 
     game_entities.append(Player(1024, render.start_coords[1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level))
@@ -142,6 +143,12 @@ def Game_Screen(level):
 
         render.wipe()
         render.draw_level()
+        #Lava drop
+        if count % 35 == 0:
+            for i in range(len(lava_drop_block_coords)):
+                drop = Lava_Drop_Projectile(lava_drop_block_coords[i][0] * render.BLOCK_SIZE, lava_drop_block_coords[i][1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level)
+                game_entities.append(drop)
+
         for entity in game_entities:
             texture = entity.get_texture()
             position = entity.position
