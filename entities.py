@@ -16,6 +16,7 @@ class Entity:
         self.get_entity_location = get_entity_location
         self.level = level
         self.traversable_blocks = self.render.traversable_blocks
+        self.killing_blocks = self.render.killing_blocks
         self.get_block = get_block
         self.dead = False
 
@@ -65,26 +66,26 @@ class Player_Projectile(Entity):
     def made_contact_with_block(self):
         if self.direction == True:
             block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE + 24, self.position[1] + 8])
-            if block in self.traversable_blocks:
+            if block in self.traversable_blocks and block not in self.killing_blocks:
                 pass
             else:
                 self.made_contact = True
             
             block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE + 24, self.position[1] + 24])
-            if block in self.traversable_blocks:
+            if block in self.traversable_blocks and block not in self.killing_blocks:
                 pass
             else:
                 self.made_contact = True
             
         else:
             block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE, self.position[1] + 8])
-            if block in self.traversable_blocks:
+            if block in self.traversable_blocks and block not in self.killing_blocks:
                 pass
             else:
                 self.made_contact = True
             
             block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE, self.position[1] + 24])
-            if block in self.traversable_blocks:
+            if block in self.traversable_blocks and block not in self.killing_blocks:
                 pass
             else:
                 self.made_contact = True
@@ -100,8 +101,8 @@ class Player_Projectile(Entity):
         self.count += 1
         if self.count % 2 == 0:
             self.gravity += 0.5
-
-        self.made_contact_with_block()
+        if self.made_contact == False:
+            self.made_contact_with_block()
         if self.made_contact == True:
             self.state = 1
             if self.count_since_contact == 4:
@@ -178,7 +179,9 @@ class Lava_Drop_Projectile(Entity):
         if self.count % 2 == 0:
             self.gravity += 0.5
 
-        self.made_contact_with_block()
+        if self.made_contact == False:
+            self.made_contact_with_block()
+
         if self.made_contact == True:
             self.state = 1
             if self.count_since_contact == 4:
@@ -190,7 +193,14 @@ class Lava_Drop_Projectile(Entity):
     
     def on_collide(self, entity):
         if entity.entity_type == "Player":
-            entity.dead = True
+            entity.shot = True
+            #entity.dead = True
+            self.made_contact = True
+        
+        if entity.entity_type == "Projectile":
+            print("COLLIDED WITH PROJECTILE")
+            entity.made_contact = True
+            self.made_contact = True
 
 
 class Player(Entity):
@@ -225,6 +235,7 @@ class Player(Entity):
         self.downward_momentum = 0
 
         self.render = render
+        self.shot = False
 
         self.dead = False
         self.finish_coords = self.render.finish_coords
@@ -258,6 +269,12 @@ class Player(Entity):
 
         self.get_world_position()
         if self.get_block([self.world_position[0] + self.render.movement_horizontal, self.world_position[1]]) in self.render.killing_blocks:
+            if self.state == 0 or self.state == 2:
+                self.state = 4
+            elif self.state == 1 or self.state == 3:
+                self.state = 5
+        
+        if self.shot == True:
             if self.state == 0 or self.state == 2:
                 self.state = 4
             elif self.state == 1 or self.state == 3:

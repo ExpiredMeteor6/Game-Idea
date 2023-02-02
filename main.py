@@ -74,12 +74,6 @@ def get_block_coords(position):
     block_within_chunk_coords = (int((actual_x_pos / 8 - chunk_coords[0]) * 8), int((actual_y_pos / 8 - chunk_coords[1]) * 8))
     return chunk_coords, block_within_chunk_coords
 
-#game_entities.append(Enemy(960, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
-#game_entities.append(Enemy(940, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
-#game_entities.append(Enemy(920, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
-#game_entities.append(Enemy(900, 100, render, ray_march, get_player_location, get_block_coords, get_entity_location))
-
-
 game_entities = []
 level_music = {0 : "Audio/Time.mp3",
                 1 : "Audio/Mist.mp3"}
@@ -348,7 +342,7 @@ def Level_Selection_Screen():
     back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (150,100))
     
     level_1 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 1: Dangerous Caverns", (700, 250))
-    level_2 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 2: To be added", (585, 325))
+    level_2 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 2: Toasty Hollows", (585, 325))
 
     title = Text(render, (0,0,205), "Level Selection:", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
     
