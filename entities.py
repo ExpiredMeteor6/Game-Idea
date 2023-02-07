@@ -57,6 +57,8 @@ class Player_Projectile(Entity):
 
         self.entity_type = "Projectile"
     
+
+    #Each entity state codes for a specific texture, the below function returns the texture of the entity when called
     def get_texture(self):
         if self.state == 0:
             return self.blue_projectile
@@ -138,6 +140,7 @@ class Lava_Drop_Projectile(Entity):
 
         self.entity_type = "Lava Drop"
     
+    #Each entity state codes for a specific texture, the below function returns the texture of the entity when called
     def get_texture(self):
         if self.state == 0:
             return self.lava_drop_projectile
@@ -246,6 +249,8 @@ class Player(Entity):
 
         self.entity_type = "Player"
 
+
+    #Each entity state codes for a specific texture, the below function returns the texture of the entity when called
     def get_texture(self):
         if self.state == 0:
             texture = self.player_img_right
@@ -263,6 +268,7 @@ class Player(Entity):
             pass
         return texture
     
+    #Checks if the player is dead then sets the players state accordingly
     def is_dead(self):
         if self.position[1] >= 1000:
             self.dead = True
@@ -315,22 +321,27 @@ class Player(Entity):
             else:
                 self.shoot = True
                 return self.shoot
-        
+
+    #When movement key is released stop moving horizontally (self.moving = 0)   
     def on_key_release(self, key):
         if key == pygame.K_d and self.moving == 1:
             self.moving = 0
         if key == pygame.K_a and self.moving == -1:
             self.moving = 0
     
+    #Converts the players screen position into a node within the map (block coordinate, used for enemy A* Pathfinding) 
     def convert_local_coords_to_global(self):
         node = self.get_block_coords((self.get_world_position()[0] + int(self.render.movement_horizontal) + 16, self.get_world_position()[1] + int(self.render.movement_vertical)))
         end_node = [node[0][0]*8 + node[1][0], node[0][1]*8 + node[1][1]]
         return end_node
 
+    #Checks if the players coordinated match that of the block containing the finish flag, if thats the case it sets self.finished to True allowing the game to end and the level completed screen to be shown
     def check_reached_finish(self):
         if self.convert_local_coords_to_global() == self.finish_coords:
             self.finished = True
     
+    #If the entity has collided with another entity, the main game loop calls this function which sets the players state to the death states
+    #Player death is then detetced in the tick function and processed there
     def on_collide(self, entity):
         if entity.entity_type == "Enemy":
             if entity.state == 4 or entity.state == 5:
@@ -341,6 +352,12 @@ class Player(Entity):
                 elif self.state == 1 or self.state == 3:
                     self.state = 5
     
+    #The tick function when called by the main game loop, causes the players character to update
+    #Checks if player is dead or has reached the finish line
+    #Updates the position of the player (allowing movement)
+    #Reduces time till next shot each time this entity is 'ticked' (entity.tick function is called) until time_till_next_shot = 0 allowing the player to use the shooting function again
+    #Updates players texture when moving (dependent on direction)
+    #Every 10 ticks, calls the bounce function
     def tick(self):
         self.count += 1
 
@@ -450,6 +467,7 @@ class Player(Entity):
                 elif self.state == 3:
                     self.state = 1
 
+    #When the player moves this bounce function runs causing the character to look like hes bouncing up and down (gives the illusion of a more complex movement)
     def bounce(self):
         if self.state == 0:
             self.state = 2
@@ -508,6 +526,7 @@ class Enemy(Entity):
         self.entity_num = 0
         
     
+    #Each entity state codes for a specific texture, the below function returns the texture of the entity when called
     def get_texture(self):
         if self.state == 0:
             texture = self.enemy_img_right
@@ -624,40 +643,6 @@ class Enemy(Entity):
                         self.moving = 0
                     
                 
-
-
-
-                    #relic either remove or develop later
-                    '''
-                    else:
-                        print(node)
-                        if start_end_nodes[1] in self.route:
-                            print("test")
-                            pos_in_list = self.route.index(node)
-                            print(f"Pos_in_list = {pos_in_list}")
-                            if pos_in_list > 0:
-                                for i in range(pos_in_list):
-                                    print("skipped node")
-                                    self.route.remove(self.route[0])
-                        else:
-                            if node[0] < start_end_nodes[1][0]:
-                                self.moving = 1
-                                if self.state == 1 or self.state == 3:
-                                    self.state = 0
-                            if node[0] > start_end_nodes[1][0]:
-                                self.moving = -1
-                                if self.state == 0 or self.state == 2:
-                                    self.state = 1
-                            if node[1] > start_end_nodes[1][1]:
-                                if self.count_at_activation == 0 and self.ON_GROUND == True:
-                                    self.JUMPING = True
-                                    self.count_at_activation = self.count
-
-                            if node == start_end_nodes[1]:
-                                print(f"correction reached {node}")
-                                self.route.remove(node)
-                                self.moving = 0
-                                '''
             self.count += 1
             self.is_dead()
 
@@ -758,6 +743,7 @@ class Enemy(Entity):
                 elif self.state == 3:
                     self.state = 1
     
+    #When the enemy moves this bounce function runs causing the character to look like hes bouncing up and down (gives the illusion of a more complex movement)
     def bounce(self):
         if self.state == 0:
             self.state = 2
