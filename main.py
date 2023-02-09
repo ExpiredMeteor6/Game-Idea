@@ -19,6 +19,8 @@ blob_down_img = pygame.transform.scale(pygame.image.load('Images/blob_down_right
 full_size_blob = pygame.transform.scale(pygame.image.load('Images/blob_right.png'), (320,320))
 crying_blob_img = pygame.transform.scale(pygame.image.load('Images/blob_crying.png'), (320,320))
 crying_blob_2_img = pygame.transform.scale(pygame.image.load('Images/blob_crying_2.png'), (320,320))
+blob_celebration_1_img = pygame.transform.scale(pygame.image.load('Images/blob_right_celebration_1.png'), (320, 320))
+blob_celebration_2_img = pygame.transform.scale(pygame.image.load('Images/blob_right_celebration_2.png'), (320, 320))
 
 pygame.display.set_caption("The Adventures of Lil' Herb")
 pygame.display.set_icon(blob_img)
@@ -150,7 +152,7 @@ def Game_Screen(level):
             if entity == game_entities[0]: 
                 if entity.dead == True:
                     game_entities.clear()
-                    Level_Failed_Screen(level)
+                    Level_Completed_Screen(level)
                     running = False
                 elif entity.finished == True:
                     game_entities.clear()
@@ -496,10 +498,29 @@ def Level_Completed_Screen(level):
     back_to_main_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back To Main Menu", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 300))
     play_level_again = Button(render, (0,0,205), (0,0,139), (0,0,0), "Play Level Again", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 150))
     
-    blob = Display_Image(render, full_size_blob, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
+    blob_celebration_1 = Display_Image(render, blob_celebration_1_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
+    blob_celebration_2 = Display_Image(render, blob_celebration_2_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
     title = Text(render, (0,0,205), "Level Completed!", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
     
+    count = 0
+    state = 0
+
     while displayed:
+        render.wipe()
+        render.screen.blit(render.BG, (0,0))
+        if count % 40 == 0:
+            if state == 0:
+                state = 1
+            else:
+                state = 0
+        
+        if state == 1:
+            blob_celebration_1.paste_img()
+        else:
+            blob_celebration_2.paste_img()
+        
+        count += 1
+
         back_to_main_button.change_button_colour(pygame.mouse.get_pos())
         back_to_main_button.button_update()
 
@@ -507,7 +528,6 @@ def Level_Completed_Screen(level):
         play_level_again.button_update()
 
         title.paste_text()
-        blob.paste_img()
 
         for event in pygame.event.get():
             # Check for QUIT event      
