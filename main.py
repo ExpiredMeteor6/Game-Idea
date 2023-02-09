@@ -139,7 +139,7 @@ def Game_Screen(level):
 
         render.wipe()
         render.draw_level()
-        #Lava drop
+        #Lava drop timer 
         if count % 35 == 0:
             for i in range(len(lava_drop_block_coords)):
                 drop = Lava_Drop_Projectile(lava_drop_block_coords[i][0] * render.BLOCK_SIZE, lava_drop_block_coords[i][1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level)
