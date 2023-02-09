@@ -111,7 +111,6 @@ def Game_Screen(level):
     render.find_finish()
     enemy_spawn_coords = render.find_enemy_spawn_points()
     lava_drop_block_coords = render.find_lava_drop_spawners()
-    print(lava_drop_block_coords)
     running = True
 
     game_entities.append(Player(1024, render.start_coords[1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level))
@@ -152,7 +151,7 @@ def Game_Screen(level):
             if entity == game_entities[0]: 
                 if entity.dead == True:
                     game_entities.clear()
-                    Level_Completed_Screen(level)
+                    Level_Failed_Screen(level)
                     running = False
                 elif entity.finished == True:
                     game_entities.clear()
