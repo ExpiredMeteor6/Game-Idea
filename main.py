@@ -105,6 +105,21 @@ def update_enemy_list_positions():
         if entity.entity_type == "Enemy":
             game_entities[game_entities.index(entity)].entity_num = game_entities.index(entity)
 
+def time_taken_to_complete(start_time, end_time):
+    time_elapsed = end_time - start_time
+    minutes = round(time_elapsed // 60)
+    seconds = round((time_elapsed % 60), 2)
+    minutes_seconds = [minutes, seconds]
+    return minutes_seconds
+
+def on_screen_timer(start_time):
+    current_time = time.time()
+    time_elapsed = current_time - start_time
+    minutes = round(time_elapsed // 60)
+    seconds = round((time_elapsed % 60), 2)
+    minutes_seconds = [minutes, seconds]
+    return minutes_seconds
+
 def Game_Screen(level):
     render.convert_map_list_to_level(render.file.load(level))
     render.find_start()
@@ -128,6 +143,10 @@ def Game_Screen(level):
 
     render.movement_horizontal = -render.start_coords[0] + 32
 
+    timer = Text(render, (0,0,205), f"0 Minutes and 0.00 Seconds!", 20, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 400))
+    
+
+    start_time = time.time()
     while running:
         if count == 0:
             render.draw_level()
@@ -138,6 +157,11 @@ def Game_Screen(level):
 
         render.wipe()
         render.draw_level()
+
+        current_timer = on_screen_timer(start_time)
+        timer = Text(render, (0,0,205), f"{current_timer[0]} Minutes and {current_timer[1]} Seconds!", 20, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 400))
+        timer.paste_text()
+
         #Lava drop timer 
         if count % 35 == 0:
             for i in range(len(lava_drop_block_coords)):
@@ -154,8 +178,9 @@ def Game_Screen(level):
                     Level_Failed_Screen(level)
                     running = False
                 elif entity.finished == True:
+                    end_time = time.time()
                     game_entities.clear()
-                    Level_Completed_Screen(level)
+                    Level_Completed_Screen(level, time_taken_to_complete(start_time, end_time))
                     running = False
                 else:
                     render.screen.blit(texture, position)
@@ -490,7 +515,7 @@ def Level_Failed_Screen(level):
         
         count += 1
 
-def Level_Completed_Screen(level):
+def Level_Completed_Screen(level, time_to_complete):
     displayed = True
     render.screen.blit(render.BG, (0,0))
 
@@ -500,6 +525,7 @@ def Level_Completed_Screen(level):
     blob_celebration_1 = Display_Image(render, blob_celebration_1_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
     blob_celebration_2 = Display_Image(render, blob_celebration_2_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
     title = Text(render, (0,0,205), "Level Completed!", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
+    time_taken = Text(render, (0,0,205), f"Time taken to complete: {time_to_complete[0]} Minutes and {time_to_complete[1]} Seconds!", 30, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 75))
     
     count = 0
     state = 0
@@ -527,6 +553,7 @@ def Level_Completed_Screen(level):
         play_level_again.button_update()
 
         title.paste_text()
+        time_taken.paste_text()
 
         for event in pygame.event.get():
             # Check for QUIT event      
