@@ -87,11 +87,19 @@ class Render:
         self.movement_horizontal = 0
         self.movement_vertical = 0
 
-        self.WINDOW_WIDTH = 2048
-        self.WINDOW_HEIGHT = 1024
+        #self.WINDOW_WIDTH = 2048
+        #self.WINDOW_HEIGHT = 1024
+        
+        self.Info_Object = pygame.display.Info()
+        self.WINDOW_WIDTH = self.Info_Object.current_w
+        self.WINDOW_HEIGHT = self.Info_Object.current_h
+
+        print(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
 
         self.screen = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
+        #self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         self.BG = pygame.image.load('Images/Background.png').convert()
+        self.BG = pygame.transform.scale(self.BG, (self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
 
         self.grass_img = pygame.image.load('Images/grass.png').convert()
         self.air_img = pygame.image.load('Images/air.png').convert()

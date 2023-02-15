@@ -159,7 +159,7 @@ def Game_Screen(level):
         render.draw_level()
 
         current_timer = on_screen_timer(start_time)
-        timer = Text(render, (0,0,205), f"{current_timer[0]} Minutes and {current_timer[1]} Seconds!", 20, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 400))
+        timer = Text(render, (0,0,205), f"{current_timer[0]} Minutes and {current_timer[1]} Seconds!", 20, (render.WINDOW_WIDTH/2 - 600,render.WINDOW_HEIGHT/2 - 400))
         timer.paste_text()
 
         #Lava drop timer 
