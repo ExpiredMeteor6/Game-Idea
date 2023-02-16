@@ -39,12 +39,11 @@ class Player_Projectile(Entity):
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
         super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level)
 
-        self.Player_Size = 32
+        self.blue_projectile = self.render.load_entity_texture('Images/blue_projectile.png')
+        self.blue_projectile_splat = self.render.load_entity_texture('Images/blue_projectile_splat.png')
 
-        self.blue_projectile = pygame.image.load('Images/blue_projectile.png')
-        self.blue_projectile = pygame.transform.scale(self.blue_projectile, (self.Player_Size, self.Player_Size))
-        self.blue_projectile_splat = pygame.image.load('Images/blue_projectile_splat.png')
-        self.blue_projectile_splat = pygame.transform.scale(self.blue_projectile_splat, (self.Player_Size, self.Player_Size))
+        self.blue_projectile = self.render.scale_entity_texture(self.blue_projectile)
+        self.blue_projectile_splat = self.render.scale_entity_texture(self.blue_projectile_splat)
 
         self.dead = False
         self.made_contact = False
@@ -122,12 +121,10 @@ class Lava_Drop_Projectile(Entity):
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
         super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level)
 
-        self.Player_Size = 32
-
-        self.lava_drop_projectile = pygame.image.load('Images/lava_drop_projectile.png')
-        self.lava_drop_projectile = pygame.transform.scale(self.lava_drop_projectile, (self.Player_Size, self.Player_Size))
-        self.lava_drop_projectile_splat = pygame.image.load('Images/lava_drop_projectile_splat.png')
-        self.lava_drop_projectile_splat = pygame.transform.scale(self.lava_drop_projectile_splat, (self.Player_Size, self.Player_Size))
+        self.lava_drop_projectile = self.render.load_entity_texture('Images/lava_drop_projectile.png')
+        self.lava_drop_projectile_splat = self.render.load_entity_texture('Images/lava_drop_projectile_splat.png')
+        self.lava_drop_projectile = self.render.scale_entity_texture(self.lava_drop_projectile)
+        self.lava_drop_projectile_splat = self.render.scale_entity_texture(self.lava_drop_projectile_splat)
 
         self.dead = False
         self.made_contact = False
@@ -197,11 +194,9 @@ class Lava_Drop_Projectile(Entity):
     def on_collide(self, entity):
         if entity.entity_type == "Player":
             entity.shot = True
-            #entity.dead = True
             self.made_contact = True
         
         if entity.entity_type == "Projectile":
-            print("COLLIDED WITH PROJECTILE")
             entity.made_contact = True
             self.made_contact = True
 
@@ -209,25 +204,23 @@ class Lava_Drop_Projectile(Entity):
 class Player(Entity):
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
         super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level)
-        
-        self.Player_Size = 32
 
         self.moving = 0
 
-        self.player_img_right = pygame.image.load('Images/blob_right.png')
-        self.player_img_left = pygame.image.load('Images/blob_left.png')
-        self.player_img_down_right = pygame.image.load('Images/blob_down_right.png')
-        self.player_img_down_left = pygame.image.load('Images/blob_down_left.png')
-        self.player_img_right_explosion = pygame.image.load('Images/blob_right_explosion.png')
-        self.player_img_left_explosion = pygame.image.load('Images/blob_left_explosion.png')
+        self.player_img_right = self.render.load_entity_texture('Images/blob_right.png')
+        self.player_img_left = self.render.load_entity_texture('Images/blob_left.png')
+        self.player_img_down_right = self.render.load_entity_texture('Images/blob_down_right.png')
+        self.player_img_down_left = self.render.load_entity_texture('Images/blob_down_left.png')
+        self.player_img_right_explosion = self.render.load_entity_texture('Images/blob_right_explosion.png')
+        self.player_img_left_explosion = self.render.load_entity_texture('Images/blob_left_explosion.png')
         
 
-        self.player_img_right = pygame.transform.scale(self.player_img_right, (self.Player_Size, self.Player_Size))
-        self.player_img_left = pygame.transform.scale(self.player_img_left, (self.Player_Size, self.Player_Size))
-        self.player_img_down_right = pygame.transform.scale(self.player_img_down_right, (self.Player_Size, self.Player_Size))
-        self.player_img_down_left = pygame.transform.scale(self.player_img_down_left, (self.Player_Size, self.Player_Size))
-        self.player_img_right_explosion = pygame.transform.scale(self.player_img_right_explosion, (self.Player_Size, self.Player_Size))
-        self.player_img_left_explosion = pygame.transform.scale(self.player_img_left_explosion, (self.Player_Size, self.Player_Size))
+        self.player_img_right = self.render.scale_entity_texture(self.player_img_right)
+        self.player_img_left = self.render.scale_entity_texture(self.player_img_left)
+        self.player_img_down_right = self.render.scale_entity_texture(self.player_img_down_right)
+        self.player_img_down_left = self.render.scale_entity_texture(self.player_img_down_left)
+        self.player_img_right_explosion = self.render.scale_entity_texture(self.player_img_right_explosion)
+        self.player_img_left_explosion = self.render.scale_entity_texture(self.player_img_left_explosion)
 
         self.state = 0
         self.count = 0
@@ -488,21 +481,20 @@ class Cloud(Entity):
 class Enemy(Entity):
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
         super().__init__(x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block,level)
-        self.Player_Size = 32
 
-        self.enemy_img_right = pygame.image.load('Images/red_blob_right.png')
-        self.enemy_img_left = pygame.image.load('Images/red_blob_left.png')
-        self.enemy_img_down_right = pygame.image.load('Images/red_blob_down_right.png')
-        self.enemy_img_down_left = pygame.image.load('Images/red_blob_down_left.png')
-        self.red_blob_img_right_explosion = pygame.image.load('Images/red_blob_right_explosion.png')
-        self.red_blob_img_left_explosion = pygame.image.load('Images/red_blob_left_explosion.png')
+        self.enemy_img_right = self.render.load_entity_texture('Images/red_blob_right.png')
+        self.enemy_img_left = self.render.load_entity_texture('Images/red_blob_left.png')
+        self.enemy_img_down_right = self.render.load_entity_texture('Images/red_blob_down_right.png')
+        self.enemy_img_down_left = self.render.load_entity_texture('Images/red_blob_down_left.png')
+        self.red_blob_img_right_explosion = self.render.load_entity_texture('Images/red_blob_right_explosion.png')
+        self.red_blob_img_left_explosion = self.render.load_entity_texture('Images/red_blob_left_explosion.png')
 
-        self.enemy_img_right = pygame.transform.scale(self.enemy_img_right, (self.Player_Size, self.Player_Size))
-        self.enemy_img_left = pygame.transform.scale(self.enemy_img_left, (self.Player_Size, self.Player_Size))
-        self.enemy_img_down_right = pygame.transform.scale(self.enemy_img_down_right, (self.Player_Size, self.Player_Size))
-        self.enemy_img_down_left = pygame.transform.scale(self.enemy_img_down_left, (self.Player_Size, self.Player_Size))
-        self.red_blob_img_right_explosion = pygame.transform.scale(self.red_blob_img_right_explosion, (self.Player_Size, self.Player_Size))
-        self.red_blob_img_left_explosion = pygame.transform.scale(self.red_blob_img_left_explosion, (self.Player_Size, self.Player_Size))
+        self.enemy_img_right = self.render.scale_entity_texture(self.enemy_img_right)
+        self.enemy_img_left = self.render.scale_entity_texture(self.enemy_img_left)
+        self.enemy_img_down_right = self.render.scale_entity_texture(self.enemy_img_down_right)
+        self.enemy_img_down_left = self.render.scale_entity_texture(self.enemy_img_down_left)
+        self.red_blob_img_right_explosion = self.render.scale_entity_texture(self.red_blob_img_right_explosion)
+        self.red_blob_img_left_explosion = self.render.scale_entity_texture(self.red_blob_img_left_explosion)
 
         self.state = 0
         self.moving = 0

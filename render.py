@@ -83,6 +83,7 @@ class Render:
         self.SHOW_CHUNK_COORDS = False
 
         self.BLOCK_SIZE = 32
+        self.PLAYER_SIZE = 32
 
         self.movement_horizontal = 0
         self.movement_vertical = 0
@@ -94,7 +95,9 @@ class Render:
         self.BG = pygame.image.load('Images/Background.png').convert()
 
         self.load_block_texture = lambda x: pygame.image.load(x).convert()
+        self.load_entity_texture = lambda x: pygame.image.load(x)
 
+        self.scale_entity_texture = lambda x: pygame.transform.scale(x, (self.PLAYER_SIZE, self.PLAYER_SIZE))
         self.scale_texture_normal = lambda x: pygame.transform.scale(x, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         self.scale_texture_large = lambda x: pygame.transform.scale(x, (self.BLOCK_SIZE * 10, self.BLOCK_SIZE * 10))
 
