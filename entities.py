@@ -634,6 +634,7 @@ class Enemy(Entity):
                         if self.count_at_activation == 0 and self.ON_GROUND == True:
                             self.JUMPING = True
                             self.count_at_activation = self.count
+                            self.render.grunt.play()
                             #JUMP
 
                     if node == start_end_nodes[1]:

@@ -11,22 +11,21 @@ from ui import Button, Image_Button, Text, Display_Image
 from pathfinding import PathFinder
 
 pygame.init()
+render = Render()
+
 clock = pygame.time.Clock()
 FRAME_RATE = 30
 
-blob_img = pygame.transform.scale(pygame.image.load('Images/blob_right.png'), (32,32))
-blob_down_img = pygame.transform.scale(pygame.image.load('Images/blob_down_right.png'), (32,32))
-full_size_blob = pygame.transform.scale(pygame.image.load('Images/blob_right.png'), (320,320))
-crying_blob_img = pygame.transform.scale(pygame.image.load('Images/blob_crying.png'), (320,320))
-crying_blob_2_img = pygame.transform.scale(pygame.image.load('Images/blob_crying_2.png'), (320,320))
-blob_celebration_1_img = pygame.transform.scale(pygame.image.load('Images/blob_right_celebration_1.png'), (320, 320))
-blob_celebration_2_img = pygame.transform.scale(pygame.image.load('Images/blob_right_celebration_2.png'), (320, 320))
+blob_img = render.scale_texture_normal(pygame.image.load('Images/blob_right.png'))
+blob_down_img = render.scale_texture_normal(pygame.image.load('Images/blob_down_right.png'))
+full_size_blob = render.scale_texture_large(pygame.image.load('Images/blob_right.png'))
+crying_blob_img = render.scale_texture_large(pygame.image.load('Images/blob_crying.png'))
+crying_blob_2_img = render.scale_texture_large(pygame.image.load('Images/blob_crying_2.png'))
+blob_celebration_1_img = render.scale_texture_large(pygame.image.load('Images/blob_right_celebration_1.png'))
+blob_celebration_2_img = render.scale_texture_large(pygame.image.load('Images/blob_right_celebration_2.png'))
 
 pygame.display.set_caption("The Adventures of Lil' Herb")
 pygame.display.set_icon(blob_img)
-
-render = Render()
-
 
 for i in range(len(render.LEVEL_MAP_NUMBERS)):
     render.level_row()
@@ -415,15 +414,16 @@ def Help_Screen():
     #image_test = Image_Button(render, pygame.image.load('Images/grass.png').convert(), (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
     
     title = Text(render, (0,0,205), "How to play:", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
-    subtitle_movement = Text(render, (0,0,205), "Movement:", 60, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 200))
+    subtitle_movement = Text(render, (0,0,205), "Controls:", 60, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 200))
     movement_text_right = Text(render, (0,0,205), "Right: press and hold the 'D' key", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
     movement_text_left = Text(render, (0,0,205), "Left: press and hold the 'A' key", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 100))
     movement_text_jump = Text(render, (0,0,205), "Jump: press and release the 'SPACE' key", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 50))
-    subtitle_objective = Text(render, (0,0,205), "Objective:", 60, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 50))
-    main_objective = Text(render, (0,0,205), "The main goal of the game, is to reach the finish line while avoiding dangers", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 100))
-    dangers = Text(render, (0,0,205), "Dangers consist of endlessly deep pits and enemy characters", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 150))
-    enemies = Text(render, (0,0,205), "Enemies will try to stop you from completing the level by attacking you", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 200))
-    finish_line = Text(render, (0,0,205), "Reach the finish line to complete the level and unlock the next one", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 250))
+    movement_text_shoot = Text(render, (0,0,205), "Shoot: 'Left Mouse' button click then release", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
+    subtitle_objective = Text(render, (0,0,205), "Objective:", 60, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 100))
+    main_objective = Text(render, (0,0,205), "The main goal of the game, is to reach the finish line while avoiding dangers", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 150))
+    dangers = Text(render, (0,0,205), "Dangers consist of deep pits, enemy characters and blocks that can kill you", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 200))
+    enemies = Text(render, (0,0,205), "Enemies will try to stop you from completing the level by attacking you", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 250))
+    finish_line = Text(render, (0,0,205), "Reach the finish line to complete the level", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 300))
 
     while displayed:
         back_button.change_button_colour(pygame.mouse.get_pos())
@@ -435,6 +435,7 @@ def Help_Screen():
         movement_text_right.paste_text()
         movement_text_left.paste_text()
         movement_text_jump.paste_text()
+        movement_text_shoot.paste_text()
         subtitle_objective.paste_text()
         main_objective.paste_text()
         dangers.paste_text()
