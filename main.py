@@ -28,7 +28,7 @@ pygame.display.set_caption("The Adventures of Lil' Herb")
 pygame.display.set_icon(blob_img)
 
 for i in range(len(render.LEVEL_MAP_NUMBERS)):
-    render.level_row()
+    render.level_column()
 
 mode = "Level"
 
@@ -76,8 +76,6 @@ def get_block_coords(position):
     return chunk_coords, block_within_chunk_coords
 
 game_entities = []
-level_music = {0 : "Audio/Time.mp3",
-                1 : "Audio/Mist.mp3"}
 
 def check_entity_collisions():
     for entity in game_entities:
@@ -135,7 +133,7 @@ def Game_Screen(level):
 
         
 
-    render.music.load(level_music[level])
+    render.music.load(render.level_music[level])
     render.music.play(-1)
 
     count = 0

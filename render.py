@@ -94,13 +94,20 @@ class Render:
         self.screen = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
         self.BG = pygame.image.load('Images/Background.png').convert()
 
+        #Used to load block textures
         self.load_block_texture = lambda x: pygame.image.load(x).convert()
-        self.load_entity_texture = lambda x: pygame.image.load(x)
 
+        #Used to scale enemy textures
+        self.load_entity_texture = lambda x: pygame.image.load(x)
+        #Used to scale enemy textures
         self.scale_entity_texture = lambda x: pygame.transform.scale(x, (self.PLAYER_SIZE, self.PLAYER_SIZE))
+
+        #Used scale block textures + one texture in the main file for the menu screens
         self.scale_texture_normal = lambda x: pygame.transform.scale(x, (self.BLOCK_SIZE, self.BLOCK_SIZE))
+        #Used to scale some image textures in the main file for menu screens
         self.scale_texture_large = lambda x: pygame.transform.scale(x, (self.BLOCK_SIZE * 10, self.BLOCK_SIZE * 10))
 
+        #Loading textures
         self.grass_img = self.load_block_texture('Images/grass.png')
         self.air_img = self.load_block_texture('Images/air.png')
         self.dirt_img = self.load_block_texture('Images/dirt.png')
@@ -117,6 +124,7 @@ class Render:
         self.lava_dark_img = self.load_block_texture('Images/lava_dark.png')
         self.lava_light_img = self.load_block_texture('Images/lava_light.png')
 
+        #Scaling textures
         self.grass_img = self.scale_texture_normal(self.grass_img)
         self.air_img = self.scale_texture_normal(self.air_img)
         self.dirt_img = self.scale_texture_normal(self.dirt_img)
@@ -133,17 +141,29 @@ class Render:
         self.lava_dark_img = self.scale_texture_normal(self.lava_dark_img)
         self.lava_light_img = self.scale_texture_normal(self.lava_light_img)
 
+        #Initialise the pygame mixer class then set starting volume to 1
         pygame.mixer.init()
         self.music = pygame.mixer.music
-        '''self.music.load('Audio/Timeless.mp3')'''
-        '''self.music.play(-1)'''
+        self.music_volume = 1
+        
+        #Dictionary of all music that can be played
+        self.music_dict = {0: "Audio/Darkness.mp3",
+                           1: "Audio/Echoes of Time.mp3",
+                           2: "Audio/Mist.mp3",
+                           3: "Audio/Time.mp3",
+                           4: "Audio/Timeless.mp3"}
 
+        #Dictionary of the music set for each level
+        self.level_music = {0 : self.music_dict[3],
+                            1 : self.music_dict[2]}
+        
+        #Sound effects
         self.grunt = pygame.mixer.Sound('Audio/Grunt_1.WAV')
 
-        self.font = pygame.font.SysFont(None, 12)
-        self.music_volume = 1
-
+        #List of blocks that the player can move through
         self.traversable_blocks = [0, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+
+        #List of blocks that kill the player if the player moves into/through
         self.killing_blocks = [10, 11, 13]
 
         #Block x is [texture, rotated?, random texture?, extra texture if applicable]
@@ -163,7 +183,7 @@ class Render:
                        13: [self.lava_dark_img, True, True, self.lava_light_img],
                        14: [self.stone_img, True, False, None]}
 
-
+    #Rotates blocks (makes the textures look less linear)
     def place_rotated_block(self, block, y, x):
         random_num = Chunk().block_rotation(y, x)
         if random_num == 0:
@@ -172,27 +192,30 @@ class Render:
             block_rotated_img = pygame.transform.rotate(block, random_num * 90)
         return block_rotated_img
     
-    #STORY MODE
-    def level_row(self):
+    #Creates a column of chunks
+    def level_column(self):
         y = 0
         x = len(self.LEVEL_MAP) // 4
 
         for i in range(4):
             current_chunk = Chunk()
-            #print(self.LEVEL_MAP_NUMBERS[x][y])
             current_chunk.convert_map_to_chunks(x, y, self.LEVEL_MAP_NUMBERS)
             self.LEVEL_MAP.append(current_chunk)
             y += 1
 
+    #Converts image made in PIL (Library) to a pygame image
     def convert_pil_image_to_pygame(self, img):
         return pygame.image.fromstring(img.tobytes(), img.size, img.mode)
 
+    #Converts image loaded by pygame into a PIL (Library) image
     def convert_pygame_image_to_pil(self, img):
         return Image.frombytes("RGBA",(self.BLOCK_SIZE,self.BLOCK_SIZE),pygame.image.tostring(img, "RGBA", False))
     
+    #Pastes the chunk image onto the screen given the coordinates
     def draw_chunk(self, chunk_x, chunk_y):
         chunk = self.LEVEL_MAP[chunk_x*4+chunk_y]
         image = chunk.image
+        #If a chunk image has already been created, paste on screen. Else create a chunk image out of the block images (Optimisation for performance)
         if image is None:
             new_image = Image.new('RGB',(8 * self.BLOCK_SIZE ,8 * self.BLOCK_SIZE), (250,250,250))
             y = 0
@@ -230,6 +253,7 @@ class Render:
             self.screen.blit(image, (chunk_x * 8 * self.BLOCK_SIZE + self.movement_horizontal * self.BLOCK_SIZE, chunk_y * 8 * self.BLOCK_SIZE + self.movement_vertical * self.BLOCK_SIZE))
 
 
+    #Looks for the start block in the map, then sets the self.start_coords variable to the coordinates of the start block
     def find_start(self):
         chunk_num = 0
         for chunk in self.LEVEL_MAP:
@@ -261,7 +285,8 @@ class Render:
                     block_within_row += 1
                 row_within_chunk += 1
             chunk_num += 1
-    
+
+    #Looks for enemy spawn blocks in the map, then returns a list of all enemy entity spawn block coordinates
     def find_enemy_spawn_points(self):
         enemy_spawn_coords = []
         chunk_num = 0
@@ -297,6 +322,7 @@ class Render:
         
         return enemy_spawn_coords
 
+    #Looks for the finish block in the map, then sets the self.finish_coords variable to the coordinates of the finish block
     def find_finish(self):
         chunk_num = 0
         for chunk in self.LEVEL_MAP:
@@ -329,6 +355,7 @@ class Render:
                 row_within_chunk += 1
             chunk_num += 1
     
+    #Looks for the lava drop spawner blocks in the map, then returns a list of the coordinates of the block just beneath each given lava drop spawner blocks
     def find_lava_drop_spawners(self):
         lava_drop_spawners = []
         chunk_num = 0
@@ -366,7 +393,7 @@ class Render:
         return lava_drop_spawners
 
             
-
+    #Draws the level by pasting the images of each chunk on the screen, chunk by chunk
     def draw_level(self):
         for chunk in self.LEVEL_MAP:
             if chunk.x_y[0] + 1 <= abs(self.movement_horizontal / 8) or chunk.x_y[0] >= abs(self.movement_horizontal / 8) + 9:
@@ -377,9 +404,11 @@ class Render:
                 y = chunk.x_y[1]
                 self.draw_chunk(x, y)
 
+    #Sets the whole game screen to a set colour (like making a blank canvas)
     def wipe(self):
         self.screen.fill((0,0,0))
     
+    #Converts a list of chunk lists into a list of chunk objects
     def convert_map_list_to_level(self, maplst):
         self.LEVEL_MAP = []
         x = 0
