@@ -96,12 +96,10 @@ class Render:
 
         #Used to load block textures
         self.load_block_texture = lambda x: pygame.image.load(x).convert()
-
-        #Used to scale enemy textures
+        #Used to load enemy textures
         self.load_entity_texture = lambda x: pygame.image.load(x)
         #Used to scale enemy textures
         self.scale_entity_texture = lambda x: pygame.transform.scale(x, (self.PLAYER_SIZE, self.PLAYER_SIZE))
-
         #Used scale block textures + one texture in the main file for the menu screens
         self.scale_texture_normal = lambda x: pygame.transform.scale(x, (self.BLOCK_SIZE, self.BLOCK_SIZE))
         #Used to scale some image textures in the main file for menu screens
