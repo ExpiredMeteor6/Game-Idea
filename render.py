@@ -146,6 +146,23 @@ class Render:
         self.traversable_blocks = [0, 5, 6, 7, 8, 9, 10, 11, 12, 13]
         self.killing_blocks = [10, 11, 13]
 
+        #Block x is [texture, rotated?, random texture?, extra texture if applicable]
+        self.blocks = {0: [self.air_img, False, False, None],
+                       1: [self.grass_img, False, False, None],
+                       2: [self.dirt_img, True, False, None],
+                       3: [self.stone_img, True, False, None],
+                       4: [self.iron_ore_img, True, False, None],
+                       5: [self.start_img, False, False, None],
+                       6: [self.finish_img, False, False, None],
+                       7: [self.stone_background_img, True, False, None],
+                       8: [self.stone_background_start_img, False, False, None],
+                       9: [self.dirt_background_img, True, False, None],
+                       10: [self.stone_background_stalagmite_img, False, False, None],
+                       11: [self.stone_background_stalactite_img, False, False, None],
+                       12: [self.air_img, False, False, None],
+                       13: [self.lava_dark_img, True, True, self.lava_light_img],
+                       14: [self.stone_img, True, False, None]}
+
 
     def place_rotated_block(self, block, y, x):
         random_num = Chunk().block_rotation(y, x)
@@ -189,55 +206,24 @@ class Render:
                     place_img = lambda i : new_image.paste(self.convert_pygame_image_to_pil(i),(placex,placey))
                     place_rotated_img = lambda i : place_img(self.place_rotated_block(i, y, x))
 
-                    if block == 0 or block == 12:
-                        place_img(self.air_img)
+                    texture = self.blocks[block][0]
+                    rotated = self.blocks[block][1]
+                    randomed = self.blocks[block][2]
 
-                    elif block == 1:
-                        place_img(self.grass_img)
-
-                    elif block == 2:
-                        place_rotated_img(self.dirt_img)
-                    
-                    elif block == 3:
-                        place_rotated_img(self.stone_img)
-                    
-                    elif block == 4:
-                        place_rotated_img(self.iron_ore_img)
-                    
-                    elif block == 5:
-                        place_img(self.start_img)
-                    
-                    elif block == 6:
-                        place_img(self.finish_img)
-                    
-                    elif block == 7:
-                        place_rotated_img(self.stone_background_img)
-                    
-                    elif block == 8:
-                        place_img(self.stone_background_start_img)
-                    
-                    elif block == 9:
-                        place_rotated_img(self.dirt_background_img)
-                    
-                    elif block == 10:
-                        place_img(self.stone_background_stalagmite_img)
-
-                    elif block == 11:
-                        place_img(self.stone_background_stalactite_img)
-                    
-                    elif block == 13:
+                    if randomed == True:
                         randomnum = random.randint(1,2)
                         if randomnum == 1:
-                            place_rotated_img(self.lava_dark_img)
+                            texture = self.blocks[block][0]
                         else:
-                            place_rotated_img(self.lava_light_img)
+                            texture = self.blocks[block][1]
                     
-                    elif block == 14:
-                        place_rotated_img(self.stone_img)
+                    if rotated == True:
+                        place_rotated_img(texture)
 
+                    else:
+                        place_img(texture)
 
                 y += 1
-            '''new_image.show()'''
 
             chunk.image = self.convert_pil_image_to_pygame(new_image)
         else:
