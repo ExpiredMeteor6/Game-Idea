@@ -27,9 +27,6 @@ blob_celebration_2_img = render.scale_texture_large(pygame.image.load('Images/bl
 pygame.display.set_caption("The Adventures of Lil' Herb")
 pygame.display.set_icon(blob_img)
 
-for i in range(len(render.LEVEL_MAP_NUMBERS)):
-    render.level_column()
-
 mode = "Level"
 
 def ray_march(current_position, direction):

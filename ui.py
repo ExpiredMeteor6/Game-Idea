@@ -14,15 +14,18 @@ class Button():
         self.text = self.font.render(self.raw_text, True, self.text_colour)
         self.rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
 
+    #Pastes the button after its state has been updated
     def button_update(self):
         self.screen.blit(self.text, self.rect)
     
+    #When called, the colour of the text on the button changes (used to show when mouse is hovering over the button)
     def change_button_colour(self, mousepos):
         if mousepos[0] in range(self.rect.left, self.rect.right) and mousepos[1] in range(self.rect.top, self.rect.bottom):
             self.text = self.font.render(self.raw_text, True, self.hovering_colour)
         else:
             self.text = self.font.render(self.raw_text, True, self.colour)
     
+    #Checks whether the user has clicked on the button
     def check_clicked(self, mousepos):
         if mousepos[0] in range(self.rect.left, self.rect.right) and mousepos[1] in range(self.rect.top, self.rect.bottom):
             return True
@@ -38,9 +41,11 @@ class Image_Button():
         self.y_pos = pos[1]
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
     
+    #Pastes the image button after its state has been updated
     def button_update(self):
         self.screen.blit(self.image, self.rect)
     
+    #Checks whether the user has clicked on the button
     def check_clicked(self, mousepos):
         if mousepos[0] in range(self.rect.left, self.rect.right) and mousepos[1] in range(self.rect.top, self.rect.bottom):
             return True
@@ -63,6 +68,7 @@ class Text():
         self.text = self.font.render(self.raw_text, True, self.text_colour)
         self.rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
 
+    #Pastes the text passed in on the screen
     def paste_text(self):
         self.screen.blit(self.text, self.rect)
 
@@ -75,6 +81,7 @@ class Display_Image():
         self.y_pos = pos[1]
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
     
+    #Pastes the image passed in on the screen
     def paste_img(self):
         self.screen.blit(self.image, self.rect)
     
