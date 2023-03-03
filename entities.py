@@ -374,6 +374,8 @@ class Player(Entity):
             can_move2 = self.raymarch_func(pos, (0, 1))
 
             if self.shoot == True:
+                #Enable line below for no delay between shots
+                #self.shoot = False
                 if self.time_till_next_shot == 0:
                     self.shoot = False
                     self.time_till_next_shot = 15

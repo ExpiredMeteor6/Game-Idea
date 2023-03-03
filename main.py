@@ -16,13 +16,13 @@ render = Render()
 clock = pygame.time.Clock()
 FRAME_RATE = 30
 
-blob_img = render.scale_texture_normal(pygame.image.load('Images/blob_right.png'))
-blob_down_img = render.scale_texture_normal(pygame.image.load('Images/blob_down_right.png'))
-full_size_blob = render.scale_texture_large(pygame.image.load('Images/blob_right.png'))
-crying_blob_img = render.scale_texture_large(pygame.image.load('Images/blob_crying.png'))
-crying_blob_2_img = render.scale_texture_large(pygame.image.load('Images/blob_crying_2.png'))
-blob_celebration_1_img = render.scale_texture_large(pygame.image.load('Images/blob_right_celebration_1.png'))
-blob_celebration_2_img = render.scale_texture_large(pygame.image.load('Images/blob_right_celebration_2.png'))
+blob_img = render.scale_texture_normal(render.load_entity_texture('Images/blob_right.png'))
+blob_down_img = render.scale_texture_normal(render.load_entity_texture('Images/blob_down_right.png'))
+full_size_blob = render.scale_texture_large(render.load_entity_texture('Images/blob_right.png'))
+crying_blob_img = render.scale_texture_large(render.load_entity_texture('Images/blob_crying.png'))
+crying_blob_2_img = render.scale_texture_large(render.load_entity_texture('Images/blob_crying_2.png'))
+blob_celebration_1_img = render.scale_texture_large(render.load_entity_texture('Images/blob_right_celebration_1.png'))
+blob_celebration_2_img = render.scale_texture_large(render.load_entity_texture('Images/blob_right_celebration_2.png'))
 
 pygame.display.set_caption("The Adventures of Lil' Herb")
 pygame.display.set_icon(blob_img)
@@ -153,7 +153,10 @@ def Game_Screen(level):
         render.draw_level()
 
         current_timer = on_screen_timer(start_time)
-        timer = Text(render, (0,0,205), f"{current_timer[0]} Minutes and {current_timer[1]} Seconds!", 20, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 400))
+        if current_timer[0] == 1:
+            timer = Text(render, (0,0,205), f"{current_timer[0]} Minute and {current_timer[1]} Seconds!", 20, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 400))
+        else:
+            timer = Text(render, (0,0,205), f"{current_timer[0]} Minutes and {current_timer[1]} Seconds!", 20, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 400))
         timer.paste_text()
 
         #Lava drop timer 
@@ -521,8 +524,10 @@ def Level_Completed_Screen(level, time_to_complete):
     blob_celebration_1 = Display_Image(render, blob_celebration_1_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
     blob_celebration_2 = Display_Image(render, blob_celebration_2_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
     title = Text(render, (0,0,205), "Level Completed!", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
-    time_taken = Text(render, (0,0,205), f"Time taken to complete: {time_to_complete[0]} Minutes and {time_to_complete[1]} Seconds!", 30, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 75))
-    
+    if time_to_complete[0] == 1:
+        time_taken = Text(render, (0,0,205), f"Time taken to complete: {time_to_complete[0]} Minute and {time_to_complete[1]} Seconds!", 30, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 75))
+    else:
+        time_taken = Text(render, (0,0,205), f"Time taken to complete: {time_to_complete[0]} Minutes and {time_to_complete[1]} Seconds!", 30, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 75))
     count = 0
     state = 0
 
