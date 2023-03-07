@@ -1,21 +1,21 @@
 import pygame
-import random
-from terrain_handler import Chunk 
-from animation import Idle
-import sys
 from render import Render
 import time
 import math
 from entities import Entity, Player, Enemy, Player_Projectile, Lava_Drop_Projectile
 from ui import Button, Image_Button, Text, Display_Image
-from pathfinding import PathFinder
 
+#Initialise Pygame
 pygame.init()
+
 render = Render()
 
+#Inistialise pygame Clock
 clock = pygame.time.Clock()
+#Set frame rate
 FRAME_RATE = 30
 
+#Load and scale images necessary for the screens
 blob_img = render.scale_texture_normal(render.load_entity_texture('Images/blob_right.png'))
 blob_down_img = render.scale_texture_normal(render.load_entity_texture('Images/blob_down_right.png'))
 full_size_blob = render.scale_texture_large(render.load_entity_texture('Images/blob_right.png'))
@@ -24,10 +24,10 @@ crying_blob_2_img = render.scale_texture_large(render.load_entity_texture('Image
 blob_celebration_1_img = render.scale_texture_large(render.load_entity_texture('Images/blob_right_celebration_1.png'))
 blob_celebration_2_img = render.scale_texture_large(render.load_entity_texture('Images/blob_right_celebration_2.png'))
 
+#Set window caption to "The Adventures of Lil' Herb"
 pygame.display.set_caption("The Adventures of Lil' Herb")
+#Set window icon to the blob_img
 pygame.display.set_icon(blob_img)
-
-mode = "Level"
 
 def ray_march(current_position, direction):
     pixels_traveled = 0
@@ -129,194 +129,264 @@ def Game_Screen(level):
         game_entities[game_entities.index(enemy)].entity_num = game_entities.index(enemy)
 
         
-
+    #Loads the music specific for this level and plays it
     render.music.load(render.level_music[level])
     render.music.play(-1)
 
+    #Sets count to 0
     count = 0
 
+    #Sets render.movement_horizontal to the correct value so that the player appears central on the screen
     render.movement_horizontal = -render.start_coords[0] + 32
 
+    #Create timer text label
     timer = Text(render, (0,0,205), f"0 Minutes and 0.00 Seconds!", 20, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 400))
     
-
+    #Record start time
     start_time = time.time()
-    while running:
-        if count == 0:
-            render.draw_level()
-            render.draw_level()
-            
-        count += 1
-        check_entity_collisions()
 
+    while running:
+        #Wipe screen
         render.wipe()
+
+        #Draw level on screen
         render.draw_level()
 
+        #Get current time to complete formatted: [minutes, seconds]
         current_timer = on_screen_timer(start_time)
+
+        #The if checks to see if minutes taken is 1, if so then it displays 1 minute rather than 1 minutes
         if current_timer[0] == 1:
-            timer = Text(render, (0,0,205), f"{current_timer[0]} Minute and {current_timer[1]} Seconds!", 20, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 400))
+            timer = Text(render, (0,0,205), f"{current_timer[0]} Minute and {current_timer[1]} Seconds!", 20, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 500))
         else:
-            timer = Text(render, (0,0,205), f"{current_timer[0]} Minutes and {current_timer[1]} Seconds!", 20, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 400))
+            timer = Text(render, (0,0,205), f"{current_timer[0]} Minutes and {current_timer[1]} Seconds!", 20, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 500))
+        
+        #Paste timer text label on screen
         timer.paste_text()
 
-        #Lava drop timer 
+        #Lava drop timer (every time count / 35 has no remainder, trigger all lava drop spwaners to spawn a lava drop)
         if count % 35 == 0:
             for i in range(len(lava_drop_block_coords)):
+                #Create lava_drop_porjectile entity then append to game_entities list
                 drop = Lava_Drop_Projectile(lava_drop_block_coords[i][0] * render.BLOCK_SIZE, lava_drop_block_coords[i][1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level)
                 game_entities.append(drop)
 
         for entity in game_entities:
+            #Get entity texture
             texture = entity.get_texture()
+            #Get entity position
             position = entity.position
 
+            #If entity is the player (game_entities[0])
             if entity == game_entities[0]: 
                 if entity.dead == True:
+                    #If dead, clear game_entities list, stop showing this screen and show level failed screen
                     game_entities.clear()
                     Level_Failed_Screen(level)
                     running = False
                 elif entity.finished == True:
+                    #If level completed, record time, clear game_entities list, stop showing this screen and show level completed screen
                     end_time = time.time()
                     game_entities.clear()
                     Level_Completed_Screen(level, time_taken_to_complete(start_time, end_time))
                     running = False
                 else:
+                    #Else, paste player image on screen
                     render.screen.blit(texture, position)
                 
             else:
-                '''print((entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))'''
+                #Checks if entity is dead, if not the entity image is pasted onto the screen
                 if entity.dead == True:
+                    #If the entity type is Enemy
                     if entity.entity_type == "Enemy":
-                        
+                        #Remove entity from game_entities list
                         game_entities.remove(entity)
+                        #Update position of remaining enemy entities in game entities list
                         update_enemy_list_positions()
                         
-                        print("Enemy removed")
-                        for entity in game_entities:
-                            if entity.entity_type == "Enemy" and entity.shot == False:
-                                render.screen.blit(entity.get_texture(), (entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))
+                    #If entity is not enemy, just remove from game entities list
                     else:
                         game_entities.remove(entity)
-                        print("Entity removed")
                 else:
                     render.screen.blit(texture, (entity.position[0] + render.movement_horizontal * render.BLOCK_SIZE, entity.position[1] + render.movement_vertical * render.BLOCK_SIZE))
-            
+        
+        #Tick all entites within the game_entities list (all entities in the game)
         for entity in game_entities:
             entity.tick()
             
 
         for event in pygame.event.get():
-            # Check for QUIT event      
+            #Check for QUIT event      
             if event.type == pygame.QUIT:
                 running = False
 
+            #For all entities that this applies to, when a key is pressed down run this event in each applicable entity
             if event.type == pygame.KEYDOWN:
                 for entity in game_entities:
                     entity.on_key_press(event.key)
 
+            #For all entities that this applies to, when a key is released run this event in each applicable entity
             if event.type == pygame.KEYUP:
                 for entity in game_entities:
                     entity.on_key_release(event.key)
 
+            #On left mouse button click (given player can shoot (ie, not during delay time)), shoot projectile from player
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if game_entities[0].on_mouse_button_click(event.button) == True:
+                    #Find out which direction the player is facing and shoot projectile in that direction
                     if game_entities[0].state == 0 or game_entities[0].state == 2:
                         projectile = Player_Projectile(game_entities[0].position[0] - render.movement_horizontal * render.BLOCK_SIZE + 8, game_entities[0].position[1] + 6, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level)
-                        #RIGHT
+                        #Direction of travel RIGHT
                         projectile.direction = True
                         game_entities.append(projectile)
                     else:
                         projectile = Player_Projectile(game_entities[0].position[0] - render.movement_horizontal * render.BLOCK_SIZE - 8, game_entities[0].position[1] + 6, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level)
-                        #LEFT
+                        #Direction of travel LEFT
                         projectile.direction = False
                         game_entities.append(projectile)
                 
-                
-        
+        #Update display every tick (frame rate)
         pygame.display.update()
         clock.tick(FRAME_RATE)
-        #print(clock.get_fps())
+
+        #Increment count by 1
+        count += 1
+
+        #Check for entity collisions
+        check_entity_collisions()
 
 def Options_Screen():
     displayed = True
+    #Paste background on screen
     render.screen.blit(render.BG, (0,0))
 
-    volume_up_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "+", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 200))
-    volume_down_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "-", (render.WINDOW_WIDTH/2 + 150,render.WINDOW_HEIGHT/2 - 200))
+    #Create text buttons
+    music_volume_up_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "+", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 200))
+    music_volume_down_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "-", (render.WINDOW_WIDTH/2 + 150,render.WINDOW_HEIGHT/2 - 200))
+
+    sound_effect_volume_up_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "+", (render.WINDOW_WIDTH/2 + 100,render.WINDOW_HEIGHT/2 - 100))
+    sound_effect_volume_down_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "-", (render.WINDOW_WIDTH/2 + 250,render.WINDOW_HEIGHT/2 - 100))
 
     back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (150,100))
 
+    #Create text labels
     title = Text(render, (0,0,205), "Options:", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
-    volume = Text(render, (0,0,205), f"Volume: {int(render.music_volume * 10)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 200))
+    music_volume = Text(render, (0,0,205), f"Music Volume: {int(render.music_volume * 10)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 200))
+    sound_effect_volume = Text(render, (0,0,205), f"Sound Effect Volume: {int(render.sound_effect_volume * 20)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 100))
 
     while displayed:
+        #Paste background on screen
         render.screen.blit(render.BG, (0,0))
 
-        volume_up_button.change_button_colour(pygame.mouse.get_pos())
-        volume_up_button.button_update()
+        #Change text colour on button if hovering over, else reset. Then update the button
+        music_volume_up_button.change_button_colour(pygame.mouse.get_pos())
+        music_volume_up_button.button_update()
 
-        volume_down_button.change_button_colour(pygame.mouse.get_pos())
-        volume_down_button.button_update()
+        music_volume_down_button.change_button_colour(pygame.mouse.get_pos())
+        music_volume_down_button.button_update()
+
+        sound_effect_volume_up_button.change_button_colour(pygame.mouse.get_pos())
+        sound_effect_volume_up_button.button_update()
+
+        sound_effect_volume_down_button.change_button_colour(pygame.mouse.get_pos())
+        sound_effect_volume_down_button.button_update()
 
         back_button.change_button_colour(pygame.mouse.get_pos())
         back_button.button_update()
-    
+
+        #Paste all text labels
         title.paste_text()
-        volume.paste_text()
+        music_volume.paste_text()
+        sound_effect_volume.paste_text()
 
         for event in pygame.event.get():
-            # Check for QUIT event      
+            #Check for QUIT event      
             if event.type == pygame.QUIT:
                 displayed = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if volume_up_button.check_clicked(pygame.mouse.get_pos()) == True:
+                if music_volume_up_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Check if music volume greater than or equal to 1 (highest volume)
                     if render.music_volume >= 1:
                         pass
                     else:
+                        #Increase the sound effect volume by 0.1 then update the music_volume text label
                         render.music_volume += 0.1
                         render.music.set_volume(render.music_volume)
-                        volume = Text(render, (0,0,205), f"Volume: {int(render.music_volume * 10)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 200))
+                        music_volume = Text(render, (0,0,205), f"Music Volume: {int(render.music_volume * 10)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 200))
 
-                if volume_down_button.check_clicked(pygame.mouse.get_pos()) == True:
+                if music_volume_down_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Check if music volume less than or equal to 0.1 (lowest volume)
                     if render.music_volume <= 0.1:
                         pass
                     else:
+                        #Decrease the sound effect volume by 0.1 then update the music_volume text label
                         render.music_volume -= 0.1
                         render.music.set_volume(render.music_volume)
-                        volume = Text(render, (0,0,205), f"Volume: {int(render.music_volume * 10)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 200))
+                        music_volume = Text(render, (0,0,205), f"Music Volume: {int(render.music_volume * 10)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 200))
+                
+                if sound_effect_volume_up_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Check if sound effect volume greater than or equal to 0.5 (highest volume)
+                    if render.sound_effect_volume >= 0.5:
+                        pass
+                    else:
+                        #Increase the sound effect volume by 0.05 then update the sound_effect_volume text label
+                        render.sound_effect_volume += 0.05
+                        sound_effect_volume = Text(render, (0,0,205), f"Sound Effect Volume: {int(render.sound_effect_volume * 20)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 100))
+
+                if sound_effect_volume_down_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Check if sound effect volume less than or equal to 0.05 (lowest volume)
+                    if render.sound_effect_volume <= 0.05:
+                        pass
+                    else:
+                        #Reduce the sound effect volume by 0.05 then update the sound_effect_volume text label
+                        render.sound_effect_volume -= 0.05
+                        sound_effect_volume = Text(render, (0,0,205), f"Sound Effect Volume: {int(render.sound_effect_volume * 20)}", 60, (render.WINDOW_WIDTH/2 - 300,render.WINDOW_HEIGHT/2 - 100))
                 
                 if back_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Start_Screen
                     Start_Screen()
                     displayed = False
 
+        #Update display every tick (frame rate)
         pygame.display.update()
         clock.tick(FRAME_RATE)
 
 def Start_Screen():
     displayed = True
+    #Paste background on screen
     render.screen.blit(render.BG, (0,0))
 
+    #Create text label (Title)
     game_title = Text(render, (0,0,205), "The Adventures of Lil' Herb", 120, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
+
+    #Create text buttons
     start_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Play", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
     options_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Options", (render.WINDOW_WIDTH/2 - 150,render.WINDOW_HEIGHT/2 + 150))
     help_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Help", (render.WINDOW_WIDTH/2 + 175,render.WINDOW_HEIGHT/2 + 150))
     quit_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Quit", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 300))
 
+    #Create images that can be pasted onto the screen
     blob = Display_Image(render, blob_img, (render.WINDOW_WIDTH/2 - 740,render.WINDOW_HEIGHT/2 - 404))
     blob_down = Display_Image(render, blob_down_img, (render.WINDOW_WIDTH/2 - 740,render.WINDOW_HEIGHT/2 - 404))
 
+    #Set count and state to 0
     count = 0
     state = 0
 
     while displayed:
+        #Swap between state 1 and state 0 when the count % 10 is equal to 0 (count / 10 has no remainder)
         if count % 10 == 0:
             if state == 0:
                 state = 1
             else:
                 state = 0
-                
+
+        #Wipe the screen
         render.wipe()
+        #Paste background on screen
         render.screen.blit(render.BG, (0,0))
 
+        #Change text colour on button if hovering over, else reset. Then update the button
         start_button.change_button_colour(pygame.mouse.get_pos())
         start_button.button_update()
 
@@ -329,48 +399,59 @@ def Start_Screen():
         quit_button.change_button_colour(pygame.mouse.get_pos())
         quit_button.button_update()
 
+        #Paste text
         game_title.paste_text()
 
+        #Paste the image on the screen dependent on which state
         if state == 0:
             blob.paste_img()
         else:
             blob_down.paste_img()
 
         for event in pygame.event.get():
-            # Check for QUIT event      
+            #Check for QUIT event      
             if event.type == pygame.QUIT:
                 displayed = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Level_Selection_Screen
                     Level_Selection_Screen()
                     displayed = False
                 if options_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Options_Screen
                     Options_Screen()
                     displayed = False
                 if help_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Help_Screen
                     Help_Screen()
                     displayed = False
                 if quit_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen (End program)
                     displayed = False
 
-        
+        #Update display every tick (frame rate)
         pygame.display.update()
-        count += 1
         clock.tick(FRAME_RATE)
+        #Increment count by 1
+        count += 1
 
 def Level_Selection_Screen():
     displayed = True
+    #Paste background on screen
     render.screen.blit(render.BG, (0,0))
 
+    #Create text button
     back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (150,100))
     
     level_1 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 1: Dangerous Caverns", (700, 250))
     level_2 = Button(render, (0,0,205), (0,0,139), (0,0,0), "Level 2: Toasty Hollows", (585, 325))
 
+    #Create text lable (Title)
     title = Text(render, (0,0,205), "Level Selection:", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
     
 
     while displayed:
+        #Change text colour on button if hovering over, else reset. Then update the button
         back_button.change_button_colour(pygame.mouse.get_pos())
         back_button.button_update()
 
@@ -380,37 +461,40 @@ def Level_Selection_Screen():
         level_2.change_button_colour(pygame.mouse.get_pos())
         level_2.button_update()
 
+        #Paste text
         title.paste_text()
-    
-
 
         for event in pygame.event.get():
-            # Check for QUIT event      
+            #Check for QUIT event      
             if event.type == pygame.QUIT:
                 displayed = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Start_Screen
                     Start_Screen()
                     displayed = False
                 if level_1.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Game_Screen - Level 1
                     Game_Screen(0)
                     displayed = False
                 if level_2.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Game_Screen - Level 2
                     Game_Screen(1)
                     displayed = False
 
-        
+        #Update display every tick (frame rate)
         pygame.display.update()
         clock.tick(FRAME_RATE)
 
 def Help_Screen():
     displayed = True
+    #Paste background on screen
     render.screen.blit(render.BG, (0,0))
 
+    #Create text button
     back_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back", (150,100))
     
-    #image_test = Image_Button(render, pygame.image.load('Images/grass.png').convert(), (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2))
-    
+    #Create text labels
     title = Text(render, (0,0,205), "How to play:", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
     subtitle_movement = Text(render, (0,0,205), "Controls:", 60, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 200))
     movement_text_right = Text(render, (0,0,205), "Right: press and hold the 'D' key", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
@@ -424,10 +508,11 @@ def Help_Screen():
     finish_line = Text(render, (0,0,205), "Reach the finish line to complete the level", 40, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 300))
 
     while displayed:
+        #Change text colour on button if hovering over, else reset. Then update the button
         back_button.change_button_colour(pygame.mouse.get_pos())
         back_button.button_update()
 
-        #image_test.button_update()
+        #Paste all text labels on screen
         title.paste_text()
         subtitle_movement.paste_text()
         movement_text_right.paste_text()
@@ -441,138 +526,180 @@ def Help_Screen():
         finish_line.paste_text()
 
         for event in pygame.event.get():
-            # Check for QUIT event      
+            #Check for QUIT event      
             if event.type == pygame.QUIT:
                 displayed = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Start_Screen
                     Start_Screen()
                     displayed = False
-                #if image_test.check_clicked(pygame.mouse.get_pos()) == True:
-                    #Game_Screen(0)
-                    #displayed = False
-
         
+        #Update display every tick (frame rate)
         pygame.display.update()
         clock.tick(FRAME_RATE)
 
 def Level_Failed_Screen(level):
+    #Load sad music and play when screen displayed
     render.music.load('Audio/Darkness.mp3')
     render.music.set_volume(render.music_volume)
     render.music.play(-1)
+
     displayed = True
 
-    render.screen.blit(render.BG, (0,0))    
+    #Paste background on screen
+    render.screen.blit(render.BG, (0,0)) 
+    
+    #Create text buttons
     back_to_main_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back To Main Menu", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 300))
     retry_level = Button(render, (0,0,205), (0,0,139), (0,0,0), "Retry Level", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 150))
     
+    #Create images that can be pasted onto the screen
     crying_blob = Display_Image(render, crying_blob_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
     crying_blob_2 = Display_Image(render, crying_blob_2_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
+
+    #Create text label (Title)
     title = Text(render, (255,0,0), "Level Failed! You Died!", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
 
+    #Set count and state to 0
     count = 0
     state = 0
 
     while displayed:
+        #Wipe screen
         render.wipe()
+
+        #Paste background on screen
         render.screen.blit(render.BG, (0,0))
+
+        #Swap between state 1 and state 0 when the count % 10 is equal to 0 (count / 10 has no remainder)
         if count % 10 == 0:
             if state == 0:
                 state = 1
             else:
                 state = 0
         
+        #Paste the image on the screen dependent on which state
         if state == 1:
             crying_blob.paste_img()
         else:
             crying_blob_2.paste_img()
-            
+        
+        #Change text colour on button if hovering over, else reset. Then update the button
         back_to_main_button.change_button_colour(pygame.mouse.get_pos())
         back_to_main_button.button_update()
 
         retry_level.change_button_colour(pygame.mouse.get_pos())
         retry_level.button_update()
 
+        #Paste text
         title.paste_text()
 
         for event in pygame.event.get():
-            # Check for QUIT event      
+            #Check for QUIT event      
             if event.type == pygame.QUIT:
                 displayed = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_to_main_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Start_Screen
                     Start_Screen()
                     displayed = False
                 if retry_level.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Game_Screen - Replaying the level just failed
                     Game_Screen(level)
                     displayed = False
 
 
-        
+        #Update display every tick (frame rate)
         pygame.display.update()
         clock.tick(FRAME_RATE)
-        
+
+        #Increment count by 1
         count += 1
 
 def Level_Completed_Screen(level, time_to_complete):
     displayed = True
+    #Paste background on screen
     render.screen.blit(render.BG, (0,0))
 
+    #Create text buttons
     back_to_main_button = Button(render, (0,0,205), (0,0,139), (0,0,0), "Back To Main Menu", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 300))
     play_level_again = Button(render, (0,0,205), (0,0,139), (0,0,0), "Play Level Again", (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 150))
     
+    #Create images that can be pasted onto the screen
     blob_celebration_1 = Display_Image(render, blob_celebration_1_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
     blob_celebration_2 = Display_Image(render, blob_celebration_2_img, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 150))
+
+    #Create text label (Title)
     title = Text(render, (0,0,205), "Level Completed!", 80, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 - 350))
+
+    #Create text label that displays how long the level took to complete
+    #The if checks to see if minutes taken is 1, if so then it displays 1 minute rather than 1 minutes
     if time_to_complete[0] == 1:
         time_taken = Text(render, (0,0,205), f"Time taken to complete: {time_to_complete[0]} Minute and {time_to_complete[1]} Seconds!", 30, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 75))
     else:
         time_taken = Text(render, (0,0,205), f"Time taken to complete: {time_to_complete[0]} Minutes and {time_to_complete[1]} Seconds!", 30, (render.WINDOW_WIDTH/2,render.WINDOW_HEIGHT/2 + 75))
+
+    #Set count and state to 0
     count = 0
     state = 0
 
     while displayed:
+        #Wipe screen
         render.wipe()
+        #Paste background on screen
         render.screen.blit(render.BG, (0,0))
+
+        #Swap between state 1 and state 0 when the count % 40 is equal to 0 (count / 40 has no remainder)
         if count % 40 == 0:
             if state == 0:
                 state = 1
             else:
                 state = 0
-        
+
+        #Paste the image on the screen dependent on which state
         if state == 1:
             blob_celebration_1.paste_img()
         else:
             blob_celebration_2.paste_img()
         
+        #Increment count by 1
         count += 1
 
+        #Change text colour on button if hovering over, else reset. Then update the button
         back_to_main_button.change_button_colour(pygame.mouse.get_pos())
         back_to_main_button.button_update()
 
         play_level_again.change_button_colour(pygame.mouse.get_pos())
         play_level_again.button_update()
 
+        #Paste text
         title.paste_text()
         time_taken.paste_text()
 
         for event in pygame.event.get():
-            # Check for QUIT event      
+            #Check for QUIT event    
             if event.type == pygame.QUIT:
+                #Stop displaying screen
                 displayed = False
+
+            #If clicked check if a button was clicked
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_to_main_button.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Start_Screen
                     Start_Screen()
                     displayed = False
                 if play_level_again.check_clicked(pygame.mouse.get_pos()) == True:
+                    #Stop showing this screen and show the Game_Screen - Replaying the level just completed
                     Game_Screen(level)
                     displayed = False
 
 
-        
+        #Update display every tick (frame rate)
         pygame.display.update()
         clock.tick(FRAME_RATE)
 
+#Show start screen and start playing music
 render.music.load('Audio/Time.mp3')
 render.music.set_volume(render.music_volume)
 render.music.play(-1)

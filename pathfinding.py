@@ -3,11 +3,15 @@ import math
 
 class PathFinder():
     def __init__(self, startpos, endpos, level):
+        #Position of Enemy
         self.startpos = startpos
+        #Position of Player
         self.endpos = endpos
+
         self.ConnectionAssessor = ConnectionAssessor(level)
 
         self.startnode = Node(None, endpos, startpos)
+        
         self.route = []
         self.done = False
     
@@ -26,6 +30,7 @@ class PathFinder():
             current = None
             cheapest_node = None
 
+            #Look in open_nodes and find the cheapest node and set the current node to that node
             for node in open_nodes:
                 if cheapest_node == None:
                     cheapest_node = node

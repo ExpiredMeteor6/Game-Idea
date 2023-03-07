@@ -105,6 +105,11 @@ class Player_Projectile(Entity):
         if self.made_contact == False:
             self.made_contact_with_block()
         if self.made_contact == True:
+            if self.count_since_contact == 0:
+                #Plays collision sound effect
+                self.render.splat.set_volume(self.render.sound_effect_volume / 20)
+                self.render.splat.play()
+
             self.state = 1
             if self.count_since_contact == 4:
                 self.dead = True
@@ -267,17 +272,37 @@ class Player(Entity):
             self.dead = True
 
         self.get_world_position()
-        if self.get_block([self.world_position[0] + self.render.movement_horizontal, self.world_position[1]]) in self.render.killing_blocks:
+        if self.get_block([self.world_position[0] + 16 + self.render.movement_horizontal, self.world_position[1]+ 5]) in self.render.killing_blocks:
             if self.state == 0 or self.state == 2:
                 self.state = 4
+
+                #Plays death sound effect
+                self.render.splat.set_volume(self.render.sound_effect_volume)
+                self.render.splat.play()
+
             elif self.state == 1 or self.state == 3:
                 self.state = 5
+
+                #Plays death sound effect
+                self.render.splat.set_volume(self.render.sound_effect_volume)
+                self.render.splat.play()
+            
+            
         
         if self.shot == True:
             if self.state == 0 or self.state == 2:
                 self.state = 4
+
+                #Plays death sound effect
+                self.render.splat.set_volume(self.render.sound_effect_volume)
+                self.render.splat.play()
+
             elif self.state == 1 or self.state == 3:
                 self.state = 5
+            
+                #Plays death sound effect
+                self.render.splat.set_volume(self.render.sound_effect_volume)
+                self.render.splat.play()
             
 
     def get_world_position(self):
@@ -312,6 +337,10 @@ class Player(Entity):
             if self.shoot == True:
                 return False
             else:
+                #Play spit sound effect when projectile is shot
+                self.render.spit.set_volume(self.render.sound_effect_volume)
+                self.render.spit.play()
+
                 self.shoot = True
                 return self.shoot
 
@@ -548,8 +577,17 @@ class Enemy(Entity):
         if self.shot == True:
             if self.state == 0 or self.state == 2:
                 self.state = 4
+
+                #Plays death sound effect
+                self.render.splat.set_volume(self.render.sound_effect_volume)
+                self.render.splat.play()
+
             elif self.state == 1 or self.state == 3:
                 self.state = 5
+                
+                #Plays death sound effect
+                self.render.splat.set_volume(self.render.sound_effect_volume)
+                self.render.splat.play()
     
     def convert_local_coords_to_global(self, move):
         #print(self.get_player_world_position())
@@ -628,7 +666,6 @@ class Enemy(Entity):
                         if self.count_at_activation == 0 and self.ON_GROUND == True:
                             self.JUMPING = True
                             self.count_at_activation = self.count
-                            self.render.grunt.play()
                             #JUMP
 
                     if node == start_end_nodes[1]:
@@ -749,8 +786,3 @@ class Enemy(Entity):
             self.state = 3
         elif self.state == 3:
             self.state = 1
-    
-
-class Pet(Entity):
-    def __init__():
-        pass

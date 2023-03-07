@@ -83,7 +83,9 @@ class Render:
                             1 : self.music_dict[2]}
         
         #Sound effects
-        self.grunt = pygame.mixer.Sound('Audio/Grunt_1.WAV')
+        self.sound_effect_volume = 0.5
+        self.splat = pygame.mixer.Sound('Audio/Splat.WAV')
+        self.spit = pygame.mixer.Sound('Audio/Spit.WAV')
 
         #List of blocks that the player can move through
         self.traversable_blocks = [0, 5, 6, 7, 8, 9, 10, 11, 12, 13]
