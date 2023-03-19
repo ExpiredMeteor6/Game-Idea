@@ -29,6 +29,7 @@ pygame.display.set_caption("The Adventures of Lil' Herb")
 #Set window icon to the blob_img
 pygame.display.set_icon(blob_img)
 
+#Checks how many pixels the entity can move before colliding with a block
 def ray_march(current_position, direction):
     pixels_traveled = 0
     max_pixels = 16
@@ -38,12 +39,15 @@ def ray_march(current_position, direction):
         current_position[1] += direction[1]
     return pixels_traveled
 
+#Gets the position of the player
 def get_player_location():
     return game_entities[0].get_world_position()
 
+#Gets the position of the entity specified by the entities position in the game_entites list
 def get_entity_location(position_in_list):
     return game_entities[position_in_list].position
 
+#Using the relative screen position this function finds that block number of that specific position
 def get_block(current_position):
     current_block_size = render.BLOCK_SIZE
 
@@ -59,6 +63,7 @@ def get_block(current_position):
     block = render.LEVEL_MAP[chunk_coords[0] * 4 + chunk_coords[1]].CHUNK[block_within_chunk_coords[1]][block_within_chunk_coords[0]]
     return block
 
+#Using relative screen position, this function calculates the chunk coords and block within chunk coords at that relative screen position
 def get_block_coords(position):
     current_block_size = render.BLOCK_SIZE
 
@@ -72,8 +77,10 @@ def get_block_coords(position):
     block_within_chunk_coords = (int((actual_x_pos / 8 - chunk_coords[0]) * 8), int((actual_y_pos / 8 - chunk_coords[1]) * 8))
     return chunk_coords, block_within_chunk_coords
 
+#List of all entites alive in the game, (added to and removed from)
 game_entities = []
 
+#Checks whether 2 entities have collided
 def check_entity_collisions():
     for entity in game_entities:
         if entity.entity_type == "Player":
@@ -91,14 +98,17 @@ def check_entity_collisions():
                     entity.on_collide(other_entity)
                     other_entity.on_collide(entity)
 
+#Checks whether 2 given entites are within 10 pixels of each other
 def within_10_px(entity1, entity2):
     return abs(entity1[0] - entity2[0]) < 10 and abs(entity1[1] - entity2[1]) < 10
 
+#Updates each enemy entites position within the list (helps when managing enemies movement and state etc)
 def update_enemy_list_positions():
     for entity in game_entities:
         if entity.entity_type == "Enemy":
             game_entities[game_entities.index(entity)].entity_num = game_entities.index(entity)
 
+#Takes the start time and the end time then returns the minutes and seconds that the level took to complete
 def time_taken_to_complete(start_time, end_time):
     time_elapsed = end_time - start_time
     minutes = round(time_elapsed // 60)
@@ -106,6 +116,7 @@ def time_taken_to_complete(start_time, end_time):
     minutes_seconds = [minutes, seconds]
     return minutes_seconds
 
+#Takes the start time (of the level) and returns the minutes and seconds since that time
 def on_screen_timer(start_time):
     current_time = time.time()
     time_elapsed = current_time - start_time
@@ -115,14 +126,21 @@ def on_screen_timer(start_time):
     return minutes_seconds
 
 def Game_Screen(level):
+    #Loads the map coded for by the level number
     render.convert_map_list_to_level(render.file.load(level))
+
+    #Finds all points of interest, start, end, enemy spawners, lava drop spawners
     render.find_start()
     render.find_finish()
     enemy_spawn_coords = render.find_enemy_spawn_points()
     lava_drop_block_coords = render.find_lava_drop_spawners()
+
     running = True
 
+    #Adds the Player into the game entities list and places them at the start coordinates
     game_entities.append(Player(1024, render.start_coords[1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level))
+
+    #Places enemies on the each block coordinates within the enemy_spawn_coords list
     for i in range(len(enemy_spawn_coords)):
         enemy = Enemy(enemy_spawn_coords[i][0] * render.BLOCK_SIZE, enemy_spawn_coords[i][1] * render.BLOCK_SIZE, render, ray_march, get_player_location, get_block_coords, get_entity_location, get_block, level)
         game_entities.append(enemy)
