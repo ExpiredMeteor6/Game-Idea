@@ -64,6 +64,7 @@ class Player_Projectile(Entity):
         else:
             return self.blue_projectile_splat
     
+    #Check if entity has made contact with a non traversable block
     def made_contact_with_block(self):
         if self.direction == True:
             block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE + 24, self.position[1] + 8])
@@ -91,6 +92,7 @@ class Player_Projectile(Entity):
             else:
                 self.made_contact = True
 
+    #Move the y position of the entity down (gravity) and the x position either left or right dependent on direction of travel
     def move(self):
         if self.direction == False:
             self.position[0] -= 10
@@ -98,10 +100,13 @@ class Player_Projectile(Entity):
             self.position[0] += 10
         self.position[1] += self.gravity
     
+    #The tick function when called by the main game loop, causes the entity to update
     def tick(self):
         self.count += 1
+        #Every 2 ticks increase gravity by 0.5 (gains speed as projectile falls)
         if self.count % 2 == 0:
             self.gravity += 0.5
+        #Check if projectile has made contact with block
         if self.made_contact == False:
             self.made_contact_with_block()
         if self.made_contact == True:
@@ -117,7 +122,8 @@ class Player_Projectile(Entity):
                 self.count_since_contact += 1
         else:
             self.move()
-    
+
+    #If the entity has collided with another entity, the main game loop calls this function which sets the entities state to the death state
     def on_collide(self, entity):
         if entity.entity_type == "Enemy":
             entity.shot = True
@@ -149,6 +155,7 @@ class Lava_Drop_Projectile(Entity):
         else:
             return self.lava_drop_projectile_splat
     
+    #Check if entity has made contact with a non traversable block
     def made_contact_with_block(self):
         if self.direction == True:
             block = self.get_block([self.position[0] + self.render.movement_horizontal * self.render.BLOCK_SIZE + 24, self.position[1] + 8])
@@ -176,14 +183,17 @@ class Lava_Drop_Projectile(Entity):
             else:
                 self.made_contact = True
 
+    #Move the y position of the entity down (gravity)
     def move(self):
         self.position[1] += self.gravity
     
+    #The tick function when called by the main game loop, causes the entity to update
     def tick(self):
         self.count += 1
+        #Every 2 ticks increase gravity by 0.5 (gains speed as projectile falls)
         if self.count % 2 == 0:
             self.gravity += 0.5
-
+        #Check if projectile has made contact with block
         if self.made_contact == False:
             self.made_contact_with_block()
 
@@ -195,7 +205,8 @@ class Lava_Drop_Projectile(Entity):
                 self.count_since_contact += 1
         else:
             self.move()
-    
+
+    #If the entity has collided with another entity, the main game loop calls this function which sets the entities state to the death state
     def on_collide(self, entity):
         if entity.entity_type == "Player":
             entity.shot = True
@@ -287,8 +298,6 @@ class Player(Entity):
                 self.render.splat.set_volume(self.render.sound_effect_volume)
                 self.render.splat.play()
             
-            
-        
         if self.shot == True:
             if self.state == 0 or self.state == 2:
                 self.state = 4
@@ -304,7 +313,7 @@ class Player(Entity):
                 self.render.splat.set_volume(self.render.sound_effect_volume)
                 self.render.splat.play()
             
-
+    #Finds the actual world position of the entity (where its located on the map not the screen) 
     def get_world_position(self):
         self.world_position = [self.position[0] - self.render.movement_horizontal, self.position[1] - self.render.movement_vertical]
         return self.world_position
@@ -363,7 +372,7 @@ class Player(Entity):
             self.finished = True
     
     #If the entity has collided with another entity, the main game loop calls this function which sets the players state to the death states
-    #Player death is then detetced in the tick function and processed there
+    #Player death is then detected in the tick function and processed there
     def on_collide(self, entity):
         if entity.entity_type == "Enemy":
             if entity.state == 4 or entity.state == 5:
