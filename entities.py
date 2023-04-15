@@ -318,6 +318,7 @@ class Player(Entity):
         self.world_position = [self.position[0] - self.render.movement_horizontal, self.position[1] - self.render.movement_vertical]
         return self.world_position
 
+    #When a key is pressed, check what key that is and respond in the appropriate way (movement and character texture)
     def on_key_press(self, key):
         if key == pygame.K_d:
             if self.state == 4 or self.state == 5:
@@ -340,7 +341,8 @@ class Player(Entity):
                 if self.count_at_activation == 0 and self.ON_GROUND == True:
                     self.JUMPING = True
                     self.count_at_activation = self.count
-    
+
+    #When left mouse button is clicked, execute the shoot process
     def on_mouse_button_click(self, mouse_button):
         if mouse_button == 1:
             if self.shoot == True:
@@ -395,6 +397,7 @@ class Player(Entity):
         self.is_dead()
         self.check_reached_finish()
 
+        #Check if player is in death states
         if self.state == 4 or self.state == 5:
             if self.count_since_death == 10:
                 self.dead = True
@@ -425,6 +428,7 @@ class Player(Entity):
             else:
                 self.ON_GROUND = False
             
+            #Jumping/Falling
             if self.JUMPING == False:
                 pos = copy.copy(self.position)
                 pos[0] += 30
@@ -464,7 +468,7 @@ class Player(Entity):
                 else:
                     self.jump_decay += 1
 
-
+            #Moving right
             if self.moving == 1:
                 pos = copy.copy(self.position)
                 pos[0] += 32
@@ -479,6 +483,7 @@ class Player(Entity):
                 if min(can_move1, can_move2) >= 8:
                     self.render.movement_horizontal -= self.moving / 4
 
+            #Moving left
             if self.moving == -1:
                 pos = copy.copy(self.position)
                 #11 because blob is 22 pixels tall, tiles are 32, so 10 + 1
@@ -491,9 +496,11 @@ class Player(Entity):
                 if min(can_move1, can_move2) >= 8:
                     self.render.movement_horizontal -= self.moving / 4
 
+            #Bounce every 10 ticks (not jumping, its changing of textures)
             if self.moving != 0 and self.count % 10 == 0:
                 self.bounce()
             
+            #Change texture to correctly facing one
             if self.moving == 0:
                 if self.state == 2:
                     self.state = 0
@@ -511,12 +518,6 @@ class Player(Entity):
             self.state = 3
         elif self.state == 3:
             self.state = 1
-            
-
-class Cloud(Entity):
-    def __init__():
-        super().__init__()
-        pass
 
 class Enemy(Entity):
     def __init__(self, x, y, render, raymarch_func, get_player_location, get_block_coords, get_entity_location, get_block, level):
@@ -576,13 +577,16 @@ class Enemy(Entity):
             pass
         return texture
     
+    #Checks if the enemy is dead then sets the enemy's state accordingly
     def is_dead(self):
+        #Check if enemy has fallen out of the world, then set to death state
         if self.position[1] >= 1000:
             if self.state == 0 or self.state == 2:
                 self.state = 4
             elif self.state == 1 or self.state == 3:
                 self.state = 5
-        
+
+        #Check if enemy is shot then set to death state and play sound
         if self.shot == True:
             if self.state == 0 or self.state == 2:
                 self.state = 4
@@ -598,8 +602,8 @@ class Enemy(Entity):
                 self.render.splat.set_volume(self.render.sound_effect_volume)
                 self.render.splat.play()
     
+    #Converts the enemies position into a node within the map (block coordinate, used for enemy A* Pathfinding) 
     def convert_local_coords_to_global(self, move):
-        #print(self.get_player_world_position())
         move = True
         if move == True:
             start_node = self.get_block_coords((self.get_entity_location(self.entity_num)[0] + int(self.render.movement_horizontal) * self.render.BLOCK_SIZE + 16, self.get_entity_location(self.entity_num)[1] + int(self.render.movement_vertical) * self.render.BLOCK_SIZE))
@@ -616,12 +620,15 @@ class Enemy(Entity):
             end_pos = (end_node[0][0]*8 + end_node[1][0] + int(self.render.movement_horizontal), end_node[0][1]*8 + end_node[1][1] + int(self.render.movement_vertical))
             return start_pos, end_pos
         
+    #Get the map position of the enemy (actual position in relation to map)
     def get_offset_pos(self):
         pos = copy.copy(self.position)
         pos[0] += self.render.movement_horizontal * self.render.BLOCK_SIZE
         pos[1] += self.render.movement_vertical * self.render.BLOCK_SIZE
         return pos
-
+    
+    #Code in string below is used to test enemy collisions and to move enemy to places that they can path find from (testing only)
+    '''
     def on_key_press(self, key):
         if key == pygame.K_RIGHT:
             self.moving = 1
@@ -641,19 +648,26 @@ class Enemy(Entity):
             self.moving = 0
         if key == pygame.K_LEFT and self.moving == -1:
             self.moving = 0
+    '''
 
+    #If the entity has collided with another entity, the main game loop calls this function which sets the enemy's state to the death states
+    #Enemy death is then detected in the tick function and processed there
     def on_collide(self, entity):
         if entity.entity_type == "Projectile":
             entity.made_contact = True
             self.shot = True
 
+    #The tick function when called by the main game loop, causes the enemy entity to update
+    #Updates the position of the enemy (allowing movement)
     def tick(self):
+        #Checks if enemy is in death a state
         if self.state == 4 or self.state == 5:
             if self.count_since_death == 10:
                 self.dead = True
             else:
                 self.count_since_death += 1
         else:
+            #If no route, stop moving
             if self.route == None:
                 self.moving = 0
             else:
@@ -695,25 +709,28 @@ class Enemy(Entity):
             pos = self.get_offset_pos()
             pos[1] += 32
             can_move2 = self.raymarch_func(pos, (0, 1))
-    
+
+            #Finds path to player (A*) if there is no pathfinding occuring and if the count has no remainders when divided by 20 (occurs every 20 ticks)
             if self.pathfinder == None and self.count % 20 == 0:
                 nodes = self.convert_local_coords_to_global(False)
                 if math.sqrt((nodes[0][0] - nodes[1][0])**2 + (nodes[0][1] - nodes[1][1])**2) < 8:
                     self.pathfinder = Threader(nodes[0], nodes[1], self.level)
                     self.pathfinder.start_thread()
 
+            #If pathfinding is occuring check if done else pass
             if self.pathfinder != None:
                 if self.pathfinder.is_done():
                     self.route = self.pathfinder.get_result()
                     self.pathfinder.destroy()
                     self.pathfinder = None
 
-
+            #Check if on ground
             if can_move1 == 0 or can_move2 == 0:
                 self.ON_GROUND = True
             else:
                 self.ON_GROUND = False
             
+            #Jumping/Falling
             if self.JUMPING == False:
                 pos = self.get_offset_pos()
                 pos[0] += 30
@@ -754,6 +771,7 @@ class Enemy(Entity):
                 else:
                     self.jump_decay += 1
 
+            #Moving right
             if self.moving == 1:
                 pos = self.get_offset_pos()
                 pos[0] += 32
@@ -766,6 +784,7 @@ class Enemy(Entity):
                 
                 self.position[0] += min(can_move1, can_move2, self.movement_pixels)
 
+            #Moving left
             if self.moving == -1:
                 pos = self.get_offset_pos()
                 can_move1 = self.raymarch_func(pos, (-1, 0))
@@ -778,6 +797,7 @@ class Enemy(Entity):
             if self.moving != 0 and self.count % 20 == 0:
                 self.bounce()
             
+            #Updates enemy texture when moving (dependent on direction)
             if self.moving == 0:
                 if self.state == 2:
                     self.state = 0
